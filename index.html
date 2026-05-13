@@ -795,6 +795,30 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
 
       <div class="sp-section">
         <div class="sp-section-title">Resumo Clínico</div>
+
+        <!-- Botão IA -->
+        <button id="btnIA" onclick="gerarResumoIA()" style="
+          width:100%; background:linear-gradient(135deg,#4A43C0,#7B74E0);
+          color:#fff; border:none; border-radius:var(--radius-sm);
+          padding:10px 14px; font-family:var(--font); font-size:13px;
+          font-weight:600; cursor:pointer; display:flex; align-items:center;
+          justify-content:center; gap:8px; margin-bottom:14px;
+          box-shadow:0 4px 16px rgba(123,116,224,.3);
+          transition:opacity 0.15s, transform 0.15s;">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/><circle cx="19" cy="5" r="3" fill="currentColor" stroke="none"/>
+          </svg>
+          <span id="btnIALabel">Análise de Dados</span>
+        </button>
+
+        <!-- Barra de progresso IA -->
+        <div id="iaProgress" style="display:none; margin-bottom:12px;">
+          <div style="font-size:11px; color:#888; margin-bottom:6px;" id="iaStep">Analisando perfil…</div>
+          <div style="height:3px; background:#1E1E1E; border-radius:99px; overflow:hidden;">
+            <div id="iaBar" style="height:100%; width:0%; background:linear-gradient(90deg,#4A43C0,#7B74E0); border-radius:99px; transition:width 0.4s ease;"></div>
+          </div>
+        </div>
+
         <div class="sp-field"><label class="sp-label">Interpretação geral</label><textarea class="sp-input" id="f-interp" rows="4" oninput="update()"></textarea></div>
         <div class="sp-field"><label class="sp-label">Pontos de atenção</label><textarea class="sp-input" id="f-atencao" rows="5" oninput="update()"></textarea></div>
         <div class="sp-field"><label class="sp-label">Próximos passos</label><textarea class="sp-input" id="f-proximos" rows="5" oninput="update()"></textarea></div>
@@ -1354,7 +1378,161 @@ function renderAll() {
   })();
 }
 
-/* ── INICIALIZAÇÃO ───────────────────────────────────────────── */
+/* ── GERAR RESUMO COM IA ─────────────────────────────────────── */
+async function gerarResumoIA() {
+  const btn      = document.getElementById('btnIA');
+  const label    = document.getElementById('btnIALabel');
+  const progress = document.getElementById('iaProgress');
+  const bar      = document.getElementById('iaBar');
+  const step     = document.getElementById('iaStep');
+
+  // Verifica se há dados suficientes
+  if (!DADOS.atleta && !DADOS.idade) {
+    alert('Preencha ao menos o nome ou a idade do atleta antes de gerar o resumo.');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.style.opacity = '0.7';
+  label.textContent = 'Gerando…';
+  progress.style.display = 'block';
+
+  const passos = [
+    { txt: 'Analisando perfil de personalidade…', pct: 15 },
+    { txt: 'Cruzando indicadores de saúde mental…', pct: 35 },
+    { txt: 'Aplicando literatura de neuropsicologia…', pct: 55 },
+    { txt: 'Integrando TCC e psicologia do esporte…', pct: 75 },
+    { txt: 'Redigindo resumo clínico…', pct: 90 },
+  ];
+
+  let stepIdx = 0;
+  const ticker = setInterval(() => {
+    if (stepIdx < passos.length) {
+      step.textContent = passos[stepIdx].txt;
+      bar.style.width  = passos[stepIdx].pct + '%';
+      stepIdx++;
+    }
+  }, 900);
+
+  try {
+    const D = DADOS;
+
+    // Função auxiliar de categoria
+    const catB5 = s => s < 40 ? 'abaixo da faixa normativa' : s <= 60 ? 'dentro da faixa normativa' : 'acima da faixa normativa';
+    const catQV = s => s < 50 ? 'crítico' : s <= 60 ? 'atenção' : 'satisfatório';
+
+    const prompt = `Você é um psicólogo clínico especialista em atletas de alto rendimento, com formação integrada em Neuropsicologia, Psicologia do Esporte e Terapia Cognitivo-Comportamental (TCC). Sua tarefa é redigir o Resumo Clínico e Plano de um Scanner de Performance com base nos dados a seguir.
+
+## DADOS DO ATLETA
+- Nome: ${D.atleta || 'não informado'}
+- Idade: ${D.idade || 'não informada'} anos
+- Time/Clube: ${D.time || 'não informado'}
+- Sessão: ${D.sessao || 'não informada'}
+
+## RESULTADOS DOS INSTRUMENTOS
+
+### Big Five – Personalidade (escala 0–100; faixa normativa 40–60)
+- Extroversão: ${D.big5.extroversao} (${catB5(D.big5.extroversao)})
+- Amabilidade: ${D.big5.amabilidade} (${catB5(D.big5.amabilidade)})
+- Conscienciosidade: ${D.big5.conscienciosidade} (${catB5(D.big5.conscienciosidade)})
+- Neuroticismo: ${D.big5.neuroticismo} (${catB5(D.big5.neuroticismo)})
+- Abertura à experiência: ${D.big5.abertura} (${catB5(D.big5.abertura)})
+
+### WHOQOL-BREF – Qualidade de Vida (0–100; <50 crítico, 50–60 atenção, >60 satisfatório)
+- Físico: ${D.qv.fisico} (${catQV(D.qv.fisico)})
+- Psicológico: ${D.qv.psicologico} (${catQV(D.qv.psicologico)})
+- Social: ${D.qv.social} (${catQV(D.qv.social)})
+- Ambiental: ${D.qv.ambiental} (${catQV(D.qv.ambiental)})
+- Média geral: ${((D.qv.fisico+D.qv.psicologico+D.qv.social+D.qv.ambiental)/4).toFixed(1)} (${catQV((D.qv.fisico+D.qv.psicologico+D.qv.social+D.qv.ambiental)/4)})
+
+### PSS – Percepção de Estresse (0–40; ≤13 baixo, 14–26 moderado, ≥27 elevado)
+- Score: ${D.estresse.score} (${catPSS(D.estresse.score)})
+
+### CFQ – Falhas Cognitivas (0–100; ≤45 normal, 46–49 atenção, ≥50 sobrecarga cognitiva)
+- Score: ${D.cfq.score} (${catCFQ(D.cfq.score)})
+
+### ESS – Sonolência Diurna (0–24; ≤10 normal, 11–12 limítrofe, 13–15 excessiva, ≥16 grave)
+- Score: ${D.ess.score} (${catESS(D.ess.score)})
+
+### PSQI – Qualidade do Sono (0–21; ≤4 boa, 5–10 ruim, ≥11 distúrbios de sono)
+- Score: ${D.psqi.score} (${catPSQI(D.psqi.score)})
+
+## INSTRUÇÕES DE REDAÇÃO
+
+Redija os 4 campos abaixo. Cada campo deve ser objetivo, fundamentado na literatura científica e ter tom neutro (o psicólogo revisará antes de usar). Baseie-se nas três áreas: Neuropsicologia, Psicologia do Esporte e TCC.
+
+**Regras:**
+- Use marcadores (•) quando listar itens
+- Máximo de 5 linhas por campo
+- Não repita dados numéricos desnecessariamente — foque nas implicações clínicas
+- Faça conexões entre os instrumentos (ex: neuroticismo elevado + estresse elevado + sono ruim = padrão reconhecível na literatura)
+- Quando pertinente, cite nomes de técnicas ou conceitos (ex: reestruturação cognitiva, regulação emocional, mindfulness esportivo, higiene do sono, psicoeducação)
+
+Responda APENAS com JSON válido no seguinte formato, sem texto antes ou depois, sem markdown:
+{
+  "interpretacao": "texto aqui",
+  "atencao": "texto aqui",
+  "proximos": "texto aqui",
+  "observacoes": "texto aqui"
+}`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+
+    clearInterval(ticker);
+    bar.style.width = '100%';
+    step.textContent = 'Resumo gerado com sucesso!';
+
+    // Extrai o texto da resposta
+    const raw = data.content
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('');
+
+    // Remove possíveis markdown fences e parseia
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const result = JSON.parse(clean);
+
+    // Popula os campos
+    document.getElementById('f-interp').value    = result.interpretacao  || '';
+    document.getElementById('f-atencao').value   = result.atencao        || '';
+    document.getElementById('f-proximos').value  = result.proximos       || '';
+    document.getElementById('f-obs').value        = result.observacoes   || '';
+
+    // Atualiza DADOS e o relatório
+    update();
+
+    setTimeout(() => {
+      progress.style.display = 'none';
+      bar.style.width = '0%';
+    }, 2000);
+
+  } catch (err) {
+    clearInterval(ticker);
+    step.textContent = 'Erro ao gerar resumo. Tente novamente.';
+    step.style.color = 'var(--red)';
+    bar.style.width = '0%';
+    setTimeout(() => {
+      progress.style.display = 'none';
+      step.style.color = '';
+    }, 3000);
+    console.error('Erro IA:', err);
+  } finally {
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    label.textContent = 'Análise de Dados';
+  }
+}
+
 (async function init() {
   const { data: { session } } = await db.auth.getSession();
   if (session) {
