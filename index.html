@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 /* ============================================================
    RESET & VARIÁVEIS
@@ -261,6 +262,67 @@ body {
   gap: 14px;
 }
 
+/* Métricas do dashboard */
+.dash-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  text-align: center;
+}
+.metric-card--green { border-color: #1a3d2b; }
+.metric-card--amber { border-color: #3d2f1a; }
+.metric-card--red   { border-color: #3d1a1a; }
+.metric-val { display: block; font-size: 24px; font-weight: 700; line-height: 1.1; }
+.metric-lbl { display: block; font-size: 10px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.08em; }
+.metric-card--green .metric-val { color: #4ade80; }
+.metric-card--amber .metric-val { color: #fb923c; }
+.metric-card--red   .metric-val { color: var(--red); }
+
+/* Filtro */
+.dash-filters { margin-bottom: 16px; }
+.dash-filters input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 13px;
+  padding: 10px 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.dash-filters input:focus { border-color: var(--accent); }
+
+/* Badge de risco no card */
+.pc-risk {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  padding: 2px 8px;
+  margin-bottom: 8px;
+}
+.pc-risk--green { background: #1a3d2b; color: #4ade80; }
+.pc-risk--amber { background: #3d2f1a; color: #fb923c; }
+.pc-risk--red   { background: #3d1a1a; color: var(--red); }
+.pc-risk--none  { background: var(--bg-card); color: var(--text-faint); border: 1px solid var(--border); }
+
+/* Animação fadeUp nos cards */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .patient-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -269,6 +331,7 @@ body {
   cursor: pointer;
   transition: border-color 0.15s, transform 0.15s;
   position: relative;
+  animation: fadeUp 0.25s ease both;
 }
 .patient-card:hover { border-color: #3A3A3A; transform: translateY(-2px); }
 
@@ -693,6 +756,10 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
         Novo scanner
       </button>
     </div>
+    <div class="dash-metrics" id="dash-metrics"></div>
+    <div class="dash-filters">
+      <input type="text" id="filter-input" placeholder="🔍 Buscar por nome ou sessão…" oninput="filterPatients(this.value)" />
+    </div>
     <div class="patients-grid" id="patients-grid">
       <div class="dash-loading">Carregando...</div>
     </div>
@@ -742,6 +809,17 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
       </button>
     </div>
     <div class="sp-body">
+
+      <!-- Barra de completude -->
+      <div style="padding:12px 20px 0; border-bottom:1px solid #1A1A1A;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#444;">Completude</span>
+          <span id="completude-pct" style="font-size:11px;font-weight:700;color:var(--accent);">0%</span>
+        </div>
+        <div style="background:#1A1A1A;border-radius:4px;height:5px;margin-bottom:12px;overflow:hidden;">
+          <div id="completude-bar" style="height:100%;width:0%;background:var(--accent);border-radius:4px;transition:width .4s ease;"></div>
+        </div>
+      </div>
 
       <div class="sp-section">
         <div class="sp-section-title">Identificação</div>
@@ -823,6 +901,12 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
         <div class="sp-field"><label class="sp-label">Pontos de atenção</label><textarea class="sp-input" id="f-atencao" rows="5" oninput="update()"></textarea></div>
         <div class="sp-field"><label class="sp-label">Próximos passos</label><textarea class="sp-input" id="f-proximos" rows="5" oninput="update()"></textarea></div>
         <div class="sp-field"><label class="sp-label">Observações e sugestões</label><textarea class="sp-input" id="f-obs" rows="4" oninput="update()"></textarea></div>
+      </div>
+
+      <!-- Histórico de sessões do paciente -->
+      <div class="sp-section" id="historico-section" style="display:none;">
+        <div class="sp-section-title">Histórico do paciente</div>
+        <div id="historico-list" style="display:flex;flex-direction:column;gap:6px;"></div>
       </div>
 
     </div>
@@ -909,6 +993,15 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
           <div class="card"><div class="card-title">Sonolência Diurna · ESS</div><div class="score-big" id="essScore">—</div><div class="score-max">/ 24 pontos</div><span class="badge" id="essCat">—</span><div class="prog-track"><div class="prog-fill" id="essBar"></div></div><div class="score-ranges">Normal ≤ 10<br>Limitrofe 11–12<br>Excessiva 13–15 · Grave ≥ 16</div></div>
           <div class="card"><div class="card-title">Qualidade do Sono · PSQI</div><div class="score-big" id="psqiScore">—</div><div class="score-max">/ 21 pontos</div><span class="badge" id="psqiCat">—</span><div class="prog-track"><div class="prog-fill" id="psqiBar"></div></div><div class="score-ranges">Boa qualidade ≤ 4<br>Qualidade ruim 5–10<br>Distúrbios de sono ≥ 11</div></div>
         </div>
+
+        <!-- Gráfico evolutivo (visível apenas quando há histórico) -->
+        <div id="evo-chart-wrap" style="display:none;margin-bottom:14px;">
+          <div class="card">
+            <div class="card-title">Evolução por sessão</div>
+            <canvas id="evoChart" height="120"></canvas>
+          </div>
+        </div>
+
       </div>
       <div class="summary">
         <div class="summary-hdr">Resumo Clínico &amp; Plano</div>
@@ -931,6 +1024,28 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
      JAVASCRIPT
      ══════════════════════════════════════════════════════════════ -->
 <script>
+/* ── RISCO GERAL ─────────────────────────────────────────────── */
+function calcRiscoGeral(dados) {
+  let alertas = 0;
+  if (!dados) return 'none';
+  if (dados.estresse?.score >= 27) alertas++;
+  if (dados.cfq?.score >= 50) alertas++;
+  if (dados.ess?.score >= 13) alertas++;
+  if (dados.psqi?.score >= 11) alertas++;
+  const qvMedia = dados.qv
+    ? (dados.qv.fisico + dados.qv.psicologico + dados.qv.social + dados.qv.ambiental) / 4
+    : 100;
+  if (qvMedia < 50) alertas++;
+  if (alertas >= 3) return 'red';
+  if (alertas >= 1) return 'amber';
+  return 'green';
+}
+function labelRisco(r) {
+  return r === 'red' ? 'Atenção crítica'
+       : r === 'amber' ? 'Monitorar'
+       : 'Adequado';
+}
+
 /* ── SUPABASE ────────────────────────────────────────────────── */
 const SUPABASE_URL = 'https://iloczqdolaamusvkjtcz.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlsb2N6cWRvbGFhbXVzdmtqdGN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MzY2NjYsImV4cCI6MjA5NDExMjY2Nn0.FYeKFQV1_brGyElwRH1idjweYQVoDDH9M4ZdXFqLCIc';
@@ -1027,18 +1142,23 @@ async function enterDash() {
   await loadSessions();
 }
 
+let allPatients = [];
+
 async function loadSessions() {
   const grid = document.getElementById('patients-grid');
   grid.innerHTML = '<div class="dash-loading">Carregando...</div>';
 
   const { data, error } = await db
     .from('sessions')
-    .select('id, patient_name, session_label, created_at, updated_at')
+    .select('id, patient_name, session_label, created_at, updated_at, data')
     .order('updated_at', { ascending: false });
 
   if (error) { grid.innerHTML = `<div class="dash-loading" style="color:var(--red)">Erro ao carregar: ${error.message}</div>`; return; }
 
-  if (!data.length) {
+  allPatients = data || [];
+  renderDashMetrics(allPatients);
+
+  if (!allPatients.length) {
     grid.innerHTML = `
       <div class="empty-state">
         <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -1048,10 +1168,22 @@ async function loadSessions() {
     return;
   }
 
-  grid.innerHTML = data.map(s => {
+  renderPatientCards(allPatients);
+}
+
+function renderPatientCards(list) {
+  const grid = document.getElementById('patients-grid');
+  if (!list.length) {
+    grid.innerHTML = '<div class="dash-loading">Nenhum resultado encontrado.</div>';
+    return;
+  }
+  grid.innerHTML = list.map(s => {
     const dt = new Date(s.updated_at).toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
+    const risco = calcRiscoGeral(s.data);
+    const riscoLabel = labelRisco(risco);
     return `
       <div class="patient-card" onclick="openSession('${s.id}')">
+        <div class="pc-risk pc-risk--${risco}" title="${riscoLabel}">${riscoLabel}</div>
         <div class="pc-name">${s.patient_name || '(sem nome)'}</div>
         <div class="pc-session">${s.session_label || '—'}</div>
         <div class="pc-date">Atualizado em ${dt}</div>
@@ -1062,10 +1194,60 @@ async function loadSessions() {
   }).join('');
 }
 
+function renderDashMetrics(list) {
+  const el = document.getElementById('dash-metrics');
+  if (!el) return;
+  const total = list.length;
+  const riscos = list.map(s => calcRiscoGeral(s.data));
+  const vermelhos = riscos.filter(r => r === 'red').length;
+  const ambar = riscos.filter(r => r === 'amber').length;
+  const verdes = riscos.filter(r => r === 'green').length;
+  el.innerHTML = `
+    <div class="metric-card"><span class="metric-val">${total}</span><span class="metric-lbl">Pacientes</span></div>
+    <div class="metric-card metric-card--green"><span class="metric-val">${verdes}</span><span class="metric-lbl">Adequados</span></div>
+    <div class="metric-card metric-card--amber"><span class="metric-val">${ambar}</span><span class="metric-lbl">Monitorar</span></div>
+    <div class="metric-card metric-card--red"><span class="metric-val">${vermelhos}</span><span class="metric-lbl">Atenção</span></div>
+  `;
+}
+
+function filterPatients(query) {
+  const q = (query || '').toLowerCase().trim();
+  const filtered = q ? allPatients.filter(s =>
+    (s.patient_name || '').toLowerCase().includes(q) ||
+    (s.session_label || '').toLowerCase().includes(q)
+  ) : allPatients;
+  renderPatientCards(filtered);
+}
+
 async function deleteSession(id) {
   if (!confirm('Excluir este paciente permanentemente?')) return;
   await db.from('sessions').delete().eq('id', id);
   await loadSessions();
+}
+
+async function loadHistorico(nomeAtleta) {
+  const section = document.getElementById('historico-section');
+  const list = document.getElementById('historico-list');
+  if (!nomeAtleta || !section || !list) return;
+
+  const { data, error } = await db
+    .from('sessions')
+    .select('id, session_label, updated_at')
+    .eq('patient_name', nomeAtleta)
+    .order('updated_at', { ascending: false })
+    .limit(10);
+
+  if (error || !data?.length) { section.style.display = 'none'; return; }
+
+  section.style.display = '';
+  list.innerHTML = data.map(s => {
+    const dt = new Date(s.updated_at).toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
+    const isAtual = s.id === currentSessionId;
+    return `<div style="background:#111;border:1px solid ${isAtual ? 'var(--accent)' : 'var(--border)'};border-radius:8px;padding:10px 12px;cursor:pointer;font-size:12px;" onclick="openSession('${s.id}')">
+      <div style="font-weight:600;color:${isAtual ? 'var(--accent)' : 'var(--text)'};">${s.session_label || '(sem rótulo)'}${isAtual ? ' · atual' : ''}</div>
+      <div style="color:var(--text-faint);font-size:11px;margin-top:2px;">${dt}</div>
+    </div>`;
+  }).join('');
 }
 
 /* ── SCANNER ─────────────────────────────────────────────────── */
@@ -1097,6 +1279,9 @@ async function openSession(id) {
   document.getElementById('top-patient-name').textContent = data.patient_name || '—';
   document.getElementById('top-session-label').textContent = data.session_label ? '· ' + data.session_label : '';
   showScreen('scanner');
+  // Carregar histórico e gráfico evolutivo do paciente
+  loadHistorico(data.patient_name);
+  renderEvoChart(data.patient_name);
 }
 
 async function saveSession() {
@@ -1257,6 +1442,31 @@ function updateSidebarBadges() {
   applyBadge('cat-psqi', catPSQI(DADOS.psqi.score),     rampPSQI(DADOS.psqi.score));
 }
 
+function updateCompletude() {
+  const D = DADOS;
+  const campos = [
+    D.atleta, D.data, D.sessao,
+    D.big5.extroversao, D.big5.amabilidade, D.big5.conscienciosidade, D.big5.neuroticismo, D.big5.abertura,
+    D.qv.fisico, D.qv.psicologico, D.qv.social, D.qv.ambiental,
+    D.estresse.score, D.cfq.score, D.ess.score, D.psqi.score,
+    D.resumo.interpretacao
+  ];
+  const preenchidos = campos.filter(v => v !== '' && v !== undefined && v !== null && v !== 0 || v === 0 && typeof v === 'number' && campos.indexOf(v) > 2).length;
+  // Contar só os preenchidos com valor não-vazio
+  const count = [
+    D.atleta, D.data, D.sessao,
+    D.estresse.score > 0, D.cfq.score > 0, D.ess.score > 0, D.psqi.score > 0,
+    D.big5.extroversao > 0 || D.big5.amabilidade > 0,
+    D.qv.fisico > 0 || D.qv.psicologico > 0,
+    D.resumo.interpretacao
+  ].filter(Boolean).length;
+  const pct = Math.round((count / 10) * 100);
+  const bar = document.getElementById('completude-bar');
+  const pctEl = document.getElementById('completude-pct');
+  if (bar) bar.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
+}
+
 function update() {
   DADOS.atleta    = document.getElementById('f-atleta').value;
   DADOS.data      = document.getElementById('f-data').value;
@@ -1287,10 +1497,73 @@ function update() {
   DADOS.resumo.observacoes   = document.getElementById('f-obs').value;
 
   updateSidebarBadges();
+  updateCompletude();
   renderAll();
 }
 
 /* ── RENDER ───────────────────────────────────────────────────── */
+let _evoChartInstance = null;
+
+async function renderEvoChart(nomeAtleta) {
+  const wrap = document.getElementById('evo-chart-wrap');
+  if (!wrap || !nomeAtleta) return;
+
+  const { data } = await db
+    .from('sessions')
+    .select('session_label, updated_at, data')
+    .eq('patient_name', nomeAtleta)
+    .order('updated_at', { ascending: true })
+    .limit(8);
+
+  if (!data || data.length < 2) { wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+
+  const labels = data.map(s => s.session_label || new Date(s.updated_at).toLocaleDateString('pt-BR', { day:'2-digit', month:'short' }));
+  const estresse = data.map(s => s.data?.estresse?.score ?? 0);
+  const qvMedia  = data.map(s => {
+    const qv = s.data?.qv;
+    return qv ? Math.round((qv.fisico + qv.psicologico + qv.social + qv.ambiental) / 4) : 0;
+  });
+
+  if (_evoChartInstance) _evoChartInstance.destroy();
+
+  const ctx = document.getElementById('evoChart').getContext('2d');
+  _evoChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Estresse (PSS)',
+          data: estresse,
+          borderColor: '#f87171',
+          backgroundColor: 'rgba(248,113,113,0.1)',
+          tension: 0.4,
+          pointRadius: 4,
+        },
+        {
+          label: 'QV média',
+          data: qvMedia,
+          borderColor: '#7b74e0',
+          backgroundColor: 'rgba(123,116,224,0.1)',
+          tension: 0.4,
+          pointRadius: 4,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#999', font: { size: 11 } } },
+      },
+      scales: {
+        x: { ticks: { color: '#666', font: { size: 10 } }, grid: { color: '#1f1f1f' } },
+        y: { ticks: { color: '#666', font: { size: 10 } }, grid: { color: '#1f1f1f' }, min: 0 },
+      },
+    },
+  });
+}
+
 function renderAll() {
   const D = DADOS;
   document.getElementById('athName').textContent = D.atleta    || '—';
@@ -1476,7 +1749,7 @@ Responda APENAS com JSON válido no seguinte formato, sem texto antes ou depois,
   "observacoes": "texto aqui"
 }`;
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/claude', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1511,6 +1784,13 @@ Responda APENAS com JSON válido no seguinte formato, sem texto antes ou depois,
     // Atualiza DADOS e o relatório
     update();
 
+    // Autossalvar após gerar resumo
+    if (currentSessionId) {
+      saveSession();
+    } else {
+      setSaveStatus('💾 Salve para preservar o resumo', '');
+    }
+
     setTimeout(() => {
       progress.style.display = 'none';
       bar.style.width = '0%';
@@ -1518,13 +1798,14 @@ Responda APENAS com JSON válido no seguinte formato, sem texto antes ou depois,
 
   } catch (err) {
     clearInterval(ticker);
-    step.textContent = 'Erro ao gerar resumo. Tente novamente.';
+    const msg = err?.message || 'Erro desconhecido';
+    step.textContent = `Erro: ${msg}`;
     step.style.color = 'var(--red)';
     bar.style.width = '0%';
     setTimeout(() => {
       progress.style.display = 'none';
       step.style.color = '';
-    }, 3000);
+    }, 4000);
     console.error('Erro IA:', err);
   } finally {
     btn.disabled = false;
