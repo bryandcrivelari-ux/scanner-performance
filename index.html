@@ -1765,6 +1765,14 @@ Responda APENAS com JSON válido no seguinte formato, sem texto antes ou depois,
     bar.style.width = '100%';
     step.textContent = 'Resumo gerado com sucesso!';
 
+    // Checa erro retornado pela API
+    if (data.error) {
+      throw new Error(data.error.message || JSON.stringify(data.error));
+    }
+    if (!data.content) {
+      throw new Error('Resposta inválida da API: ' + JSON.stringify(data));
+    }
+
     // Extrai o texto da resposta
     const raw = data.content
       .filter(b => b.type === 'text')
