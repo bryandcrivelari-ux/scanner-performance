@@ -591,7 +591,7 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
 .b5-dim-lbl { font-size: 12px; font-weight: 500; color: var(--text); }
 .b5-dim-num { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
 .b5-bar-norm {
-  background: var(--bg-inset);
+  background: linear-gradient(to right, var(--bg-inset) 0%, var(--bg-inset) 40%, rgba(123,116,224,.22) 40%, rgba(123,116,224,.22) 60%, var(--bg-inset) 60%, var(--bg-inset) 100%);
   height: 7px;
 }
 .b5-dim-full { grid-column: 1 / -1; }
@@ -903,6 +903,25 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
         <div class="sp-field"><label class="sp-label">Observações e sugestões</label><textarea class="sp-input" id="f-obs" rows="4" oninput="update()"></textarea></div>
       </div>
 
+      <!-- LGPD · Consentimento -->
+      <div class="sp-section">
+        <div class="sp-section-title">LGPD · Consentimento</div>
+        <div class="sp-field" style="display:flex;align-items:flex-start;gap:10px;">
+          <input type="checkbox" id="f-consentimento" oninput="update()"
+            style="margin-top:3px;width:15px;height:15px;accent-color:var(--purple);flex-shrink:0;cursor:pointer;">
+          <label for="f-consentimento" style="font-size:12px;color:var(--text-muted);line-height:1.5;cursor:pointer;">
+            Consentimento informado registrado conforme a <strong style="color:var(--text);">Resolução CFP 011/2018</strong>
+          </label>
+        </div>
+        <div class="sp-field" style="margin-top:10px;">
+          <label class="sp-label">Data do consentimento</label>
+          <input class="sp-input" id="f-consentimento-data" type="date" oninput="update()">
+        </div>
+        <div style="font-size:10px;color:var(--text-faint);margin-top:6px;line-height:1.5;">
+          Dados pessoais sensíveis tratados conforme LGPD (Lei 13.709/2018) e normas do CFP.
+        </div>
+      </div>
+
       <!-- Histórico de sessões do paciente -->
       <div class="sp-section" id="historico-section" style="display:none;">
         <div class="sp-section-title">Histórico do paciente</div>
@@ -1013,8 +1032,8 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
         </div>
       </div>
       <footer class="rpt-footer">
-        <span>Documento confidencial · uso clínico exclusivo</span>
-        <span>Scanner de Performance v3.0</span>
+        <span>Documento confidencial · uso clínico exclusivo · LGPD (Lei 13.709/2018) · Res. CFP 011/2018</span>
+        <span id="rpt-consentimento-status" style="color:var(--text-faint);">Scanner de Performance v3.0</span>
       </footer>
     </div>
   </div>
@@ -1064,6 +1083,7 @@ function defaultDados() {
     qv:   { fisico:50, psicologico:50, social:50, ambiental:50 },
     estresse: { score:0 }, cfq: { score:0 }, ess: { score:0 }, psqi: { score:0 },
     resumo: { interpretacao:'', atencao:'', proximos:'', observacoes:'' },
+    consentimento: { registrado: false, data: '' },
   };
 }
 let DADOS = defaultDados();
@@ -1350,27 +1370,15 @@ async function downloadPDF() {
 
   const element = document.querySelector('.report');
   const nome = (DADOS.atleta || 'paciente').replace(/\s+/g,'_');
-
-  // Force summary (Resumo Clínico) onto page 2
-  const summary = element.querySelector('.summary');
-  const footer  = element.querySelector('.rpt-footer');
-  if (summary) summary.style.pageBreakBefore = 'always';
-  if (footer)  footer.style.pageBreakBefore  = 'avoid';
-
   const opt = {
-    margin:      [10, 10, 10, 10],
+    margin:      [8, 8, 8, 8],
     filename:    `Scanner_${nome}.pdf`,
     image:       { type: 'jpeg', quality: 0.97 },
-    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#101010', logging: false },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#101010' },
     jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak:   { mode: ['css', 'legacy'], before: '.summary' },
   };
 
   await html2pdf().set(opt).from(element).save();
-
-  // Clean up temporary styles
-  if (summary) summary.style.pageBreakBefore = '';
-  if (footer)  footer.style.pageBreakBefore  = '';
 
   if (wasOpen) { panel.classList.add('open'); main.classList.add('panel-open'); }
 
@@ -1438,6 +1446,11 @@ function syncFormToData() {
   document.getElementById('f-atencao').value  = DADOS.resumo.atencao       || '';
   document.getElementById('f-proximos').value = DADOS.resumo.proximos      || '';
   document.getElementById('f-obs').value      = DADOS.resumo.observacoes   || '';
+
+  const chk = document.getElementById('f-consentimento');
+  const dtc = document.getElementById('f-consentimento-data');
+  if (chk) chk.checked = DADOS.consentimento?.registrado || false;
+  if (dtc) dtc.value   = DADOS.consentimento?.data       || '';
 
   updateSidebarBadges();
 }
@@ -1507,6 +1520,11 @@ function update() {
   DADOS.resumo.atencao       = document.getElementById('f-atencao').value;
   DADOS.resumo.proximos      = document.getElementById('f-proximos').value;
   DADOS.resumo.observacoes   = document.getElementById('f-obs').value;
+
+  const chk = document.getElementById('f-consentimento');
+  const dtc = document.getElementById('f-consentimento-data');
+  if (chk) DADOS.consentimento.registrado = chk.checked;
+  if (dtc) DADOS.consentimento.data       = dtc.value;
 
   updateSidebarBadges();
   updateCompletude();
@@ -1596,6 +1614,20 @@ function renderAll() {
   document.getElementById('txt-atencao').textContent       = D.resumo.atencao       || '—';
   document.getElementById('txt-proximos').textContent      = D.resumo.proximos      || '—';
   document.getElementById('txt-observacoes').textContent   = D.resumo.observacoes   || '—';
+
+  // Consentimento no rodapé
+  const consSt = document.getElementById('rpt-consentimento-status');
+  if (consSt) {
+    const c = D.consentimento;
+    if (c && c.registrado) {
+      const dt = c.data ? ` em ${c.data.split('-').reverse().join('/')}` : '';
+      consSt.textContent = `✓ Consentimento registrado${dt} · Scanner v3.0`;
+      consSt.style.color = 'var(--green)';
+    } else {
+      consSt.textContent = 'Scanner de Performance v3.0';
+      consSt.style.color = 'var(--text-faint)';
+    }
+  }
 
   // Radar
   (function(){
