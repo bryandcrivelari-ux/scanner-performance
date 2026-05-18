@@ -582,9 +582,9 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
 .prog-fill  { height: 100%; border-radius: 99px; }
 
 .row-b5 { margin-bottom: 12px; }
-.b5-inner { display: grid; grid-template-columns: 260px 1px 1fr; gap: 0 24px; align-items: center; }
+.b5-inner { display: grid; grid-template-columns: 300px 1px 1fr; gap: 0 24px; align-items: center; }
 .b5-divider { background: var(--border); align-self: stretch; margin: 4px 0; }
-.b5-radar-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.b5-radar-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; overflow: visible; }
 .b5-dims { display: flex; flex-direction: column; gap: 10px; }
 .b5-dim-item { display: flex; flex-direction: column; gap: 5px; }
 .b5-dim-header { display: flex; justify-content: space-between; align-items: baseline; }
@@ -965,14 +965,14 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
           <div class="card-title">Personalidade · Big Five</div>
           <div class="b5-inner">
             <div class="b5-radar-wrap">
-              <svg id="radarSVG" width="240" height="240" viewBox="0 0 240 240">
+              <svg id="radarSVG" width="280" height="280" viewBox="0 0 280 280" style="overflow:visible;">
                 <polygon id="g4" fill="none" stroke-width="0.6"/><polygon id="g3" fill="none" stroke-width="0.6"/>
                 <polygon id="g2" fill="none" stroke-width="0.6"/><polygon id="g1" fill="none" stroke-width="0.6"/>
                 <line id="ax0" stroke-width="0.6"/><line id="ax1" stroke-width="0.6"/><line id="ax2" stroke-width="0.6"/><line id="ax3" stroke-width="0.6"/><line id="ax4" stroke-width="0.6"/>
                 <polygon id="normZone" fill="rgba(123,116,224,0.10)" stroke="rgba(123,116,224,0.35)" stroke-width="1" stroke-dasharray="3,2.5"/>
                 <polygon id="radar" stroke-width="1.5" stroke-linejoin="round"/>
                 <circle id="rp0" r="3.5"/><circle id="rp1" r="3.5"/><circle id="rp2" r="3.5"/><circle id="rp3" r="3.5"/><circle id="rp4" r="3.5"/>
-                <text id="rl0" font-size="0"/><text id="rl1" font-size="0"/><text id="rl2" font-size="0"/><text id="rl3" font-size="0"/><text id="rl4" font-size="0"/>
+                <text id="rl0" font-size="9"/><text id="rl1" font-size="9"/><text id="rl2" font-size="9"/><text id="rl3" font-size="9"/><text id="rl4" font-size="9"/>
               </svg>
               <div class="b5-legend-row"><div class="b5-legend-swatch"></div>Faixa normativa (40–60)</div>
             </div>
@@ -1643,7 +1643,8 @@ function renderAll() {
 
   // Radar
   (function(){
-    const cx=120,cy=120,maxR=95;
+    const cx=140,cy=140,maxR=95;
+    const labels=['Extroversão','Amabilidade','Consc.','Neuroticismo','Abertura'];
     const scores=[D.big5.extroversao,D.big5.amabilidade,D.big5.conscienciosidade,D.big5.neuroticismo,D.big5.abertura];
     const n=5, ang=Array.from({length:n},(_,i)=>(i*2*Math.PI/n)-Math.PI/2);
     const pt=(r,i)=>[cx+r*Math.cos(ang[i]),cy+r*Math.sin(ang[i])];
@@ -1661,8 +1662,21 @@ function renderAll() {
     rad.setAttribute('points',pstr(scores.map((s,i)=>pt(maxR*s/100,i))));
     rad.setAttribute('fill','rgba(123,116,224,0.25)'); rad.setAttribute('stroke','#7B74E0');
     scores.forEach((s,i)=>{ const[x,y]=pt(maxR*s/100,i),p=document.getElementById('rp'+i); p.setAttribute('cx',x.toFixed(2));p.setAttribute('cy',y.toFixed(2));p.setAttribute('fill','#7B74E0'); });
-    // Labels ficam nas barras laterais — limpar textos do SVG
-    ['rl0','rl1','rl2','rl3','rl4'].forEach(id=>{ document.getElementById(id).textContent=''; });
+    // Labels ao redor do gráfico com âncora baseada no ângulo
+    labels.forEach((l,i)=>{
+      const offset=16;
+      const [x,y]=pt(maxR+offset,i);
+      const el=document.getElementById('rl'+i);
+      const cosA=Math.cos(ang[i]);
+      const anchor = cosA > 0.1 ? 'start' : cosA < -0.1 ? 'end' : 'middle';
+      const dy = Math.sin(ang[i]) > 0.1 ? 12 : Math.sin(ang[i]) < -0.1 ? -4 : 3;
+      el.setAttribute('x', x.toFixed(2));
+      el.setAttribute('y', (y + dy).toFixed(2));
+      el.setAttribute('text-anchor', anchor);
+      el.setAttribute('fill','#888884');
+      el.setAttribute('font-family','DM Sans,sans-serif');
+      el.textContent = l;
+    });
     document.getElementById('b5dims').innerHTML=[
       ['Extroversão',       D.big5.extroversao],
       ['Amabilidade',       D.big5.amabilidade],
