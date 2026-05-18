@@ -591,7 +591,7 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
 .b5-dim-lbl { font-size: 12px; font-weight: 500; color: var(--text); }
 .b5-dim-num { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
 .b5-bar-norm {
-  background: linear-gradient(to right, var(--bg-inset) 0%, var(--bg-inset) 40%, rgba(123,116,224,.22) 40%, rgba(123,116,224,.22) 60%, var(--bg-inset) 60%, var(--bg-inset) 100%);
+  background: var(--bg-inset);
   height: 7px;
 }
 .b5-dim-full { grid-column: 1 / -1; }
@@ -1350,15 +1350,27 @@ async function downloadPDF() {
 
   const element = document.querySelector('.report');
   const nome = (DADOS.atleta || 'paciente').replace(/\s+/g,'_');
+
+  // Force summary (Resumo Clínico) onto page 2
+  const summary = element.querySelector('.summary');
+  const footer  = element.querySelector('.rpt-footer');
+  if (summary) summary.style.pageBreakBefore = 'always';
+  if (footer)  footer.style.pageBreakBefore  = 'avoid';
+
   const opt = {
-    margin:      [8, 8, 8, 8],
+    margin:      [10, 10, 10, 10],
     filename:    `Scanner_${nome}.pdf`,
     image:       { type: 'jpeg', quality: 0.97 },
-    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#101010' },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#101010', logging: false },
     jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak:   { mode: ['css', 'legacy'], before: '.summary' },
   };
 
   await html2pdf().set(opt).from(element).save();
+
+  // Clean up temporary styles
+  if (summary) summary.style.pageBreakBefore = '';
+  if (footer)  footer.style.pageBreakBefore  = '';
 
   if (wasOpen) { panel.classList.add('open'); main.classList.add('panel-open'); }
 
