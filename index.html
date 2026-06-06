@@ -715,6 +715,204 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
 }
 #tests-panel.active { display: flex; }
 
+/* ══ FLASHCARDS PANEL ════════════════════════════════════════════ */
+#flashcards-panel {
+  display: none; flex: 1; overflow-y: auto;
+  flex-direction: column;
+}
+#flashcards-panel.active { display: flex; }
+
+.fc-area-header {
+  padding: 24px 28px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.fc-area-title {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 5px;
+}
+.fc-area-title svg { color: var(--purple); }
+.fc-area-sub { font-size: 12px; color: var(--text-muted); }
+
+.fc-deck-selector {
+  padding: 20px 28px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.fc-deck-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  display: flex; align-items: center; gap: 16px;
+  cursor: pointer;
+  transition: border-color .2s, transform .15s, box-shadow .2s;
+}
+.fc-deck-card:hover {
+  border-color: rgba(123,116,224,.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+.fc-deck-icon { font-size: 28px; flex-shrink: 0; }
+.fc-deck-info { flex: 1; }
+.fc-deck-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.fc-deck-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+.fc-deck-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.fc-tag {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .05em; padding: 2px 8px; border-radius: 99px;
+}
+.fc-deck-arrow { font-size: 16px; color: var(--text-faint); flex-shrink: 0; }
+
+.fc-study-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 16px;
+  flex-shrink: 0;
+}
+.fc-back-btn {
+  background: none; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text-muted);
+  font-family: var(--font); font-size: 12px; padding: 6px 12px;
+  cursor: pointer; transition: all .15s;
+}
+.fc-back-btn:hover { border-color: #444; color: var(--text); }
+.fc-deck-title-bar { font-size: 14px; font-weight: 600; color: var(--text); }
+
+.fc-tabs {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 14px 20px 8px; flex-shrink: 0;
+}
+.fc-tab {
+  padding: 4px 11px; border-radius: 99px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  color: var(--text-muted); font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all .18s;
+  text-transform: uppercase; letter-spacing: .05em;
+}
+.fc-tab:hover { border-color: var(--purple); color: var(--text); }
+.fc-tab.active { background: var(--purple); border-color: var(--purple); color: #fff; }
+
+.fc-progress-wrap {
+  padding: 0 20px 8px; flex-shrink: 0;
+}
+.fc-progress-row {
+  display: flex; justify-content: space-between;
+  font-size: 12px; color: var(--text-muted); margin-bottom: 5px;
+}
+.fc-bar-bg { background: var(--bg-inset); border-radius: 99px; height: 4px; }
+.fc-bar-fill {
+  height: 4px; border-radius: 99px;
+  background: linear-gradient(90deg, var(--purple), #A9A3E8);
+  transition: width .4s ease;
+}
+
+.fc-scene {
+  margin: 0 20px 12px;
+  perspective: 1000px; cursor: pointer;
+  flex-shrink: 0;
+}
+.fc-card {
+  width: 100%; position: relative;
+  transform-style: preserve-3d;
+  transition: transform .52s cubic-bezier(.4,0,.2,1);
+}
+.fc-card.flipped { transform: rotateY(180deg); }
+.fc-face {
+  backface-visibility: hidden;
+  border-radius: var(--radius); border: 1px solid var(--border);
+  padding: 24px 22px 48px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.fc-face.fc-front { background: var(--bg-card); }
+.fc-face.fc-back {
+  background: var(--bg-surface); transform: rotateY(180deg);
+  position: absolute; top: 0; left: 0; width: 100%;
+}
+.fc-face-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--text-faint); margin-bottom: 10px;
+}
+.fc-badge {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+  padding: 2px 9px; border-radius: 99px; margin-bottom: 10px;
+}
+.fc-question { font-size: 15px; font-weight: 600; line-height: 1.55; color: var(--text); }
+.fc-hint { font-size: 11px; color: var(--text-faint); margin-top: 12px; }
+.fc-flip-icon { font-size: 18px; position: absolute; bottom: 12px; right: 15px; opacity: .2; }
+.fc-answer-body { width: 100%; text-align: left; }
+.fc-answer-text { font-size: 13px; line-height: 1.65; color: var(--text); }
+.fc-answer-text strong { color: var(--purple-lt); }
+.fc-section { margin-bottom: 12px; }
+.fc-section:last-child { margin-bottom: 0; }
+.fc-section-label {
+  font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .08em; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;
+}
+.fc-section-label.concept { color: var(--purple-lt); }
+.fc-section-label.apply   { color: #34d399; }
+.fc-section-label.example { color: #fbbf24; }
+.fc-section-text { font-size: 12px; line-height: 1.65; color: var(--text); }
+.fc-section-text strong { color: var(--purple-lt); }
+
+.fc-rating {
+  display: flex; gap: 8px; padding: 0 20px 10px; flex-shrink: 0;
+}
+.fc-rating button {
+  flex: 1; padding: 9px 0; border-radius: 9px; border: none;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: opacity .2s, transform .13s;
+}
+.fc-rating button:hover { opacity: .82; transform: translateY(-2px); }
+.fc-btn-hard { background: rgba(248,113,113,.15); color: #f87171; border: 1px solid rgba(248,113,113,.3) !important; }
+.fc-btn-ok   { background: rgba(251,191,36,.15);  color: #fbbf24; border: 1px solid rgba(251,191,36,.3) !important; }
+.fc-btn-easy { background: rgba(52,211,153,.15);  color: #34d399; border: 1px solid rgba(52,211,153,.3) !important; }
+
+.fc-stats {
+  display: flex; gap: 10px; font-size: 12px; color: var(--text-muted);
+  margin: 0 20px 10px;
+  padding: 9px 14px; background: var(--bg-card);
+  border-radius: 9px; border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.fc-stats span { color: var(--text); font-weight: 700; }
+
+.fc-controls {
+  display: flex; gap: 7px; padding: 0 20px 16px;
+  justify-content: center; flex-wrap: wrap; flex-shrink: 0;
+}
+.fc-ctrl-btn {
+  padding: 7px 14px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  color: var(--text-muted); font-size: 12px; cursor: pointer; transition: all .18s;
+}
+.fc-ctrl-btn:hover { color: var(--text); border-color: var(--purple); }
+
+.fc-done {
+  display: none; flex-direction: column; align-items: center; text-align: center;
+  margin: 0 20px 20px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 32px 24px;
+}
+.fc-done h2 { font-size: 17px; margin-bottom: 7px; }
+.fc-done p  { color: var(--text-muted); font-size: 13px; margin-bottom: 18px; line-height: 1.6; }
+.fc-score-row { display: flex; gap: 20px; margin-bottom: 20px; }
+.fc-score-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.fc-score-num  { font-size: 26px; font-weight: 800; }
+.fc-score-lbl  { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
+.fc-restart-btn {
+  padding: 10px 24px; border-radius: 9px; border: none;
+  background: linear-gradient(135deg, var(--purple), #A9A3E8);
+  color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 9px;
+}
+.fc-restart-btn:hover { opacity: .88; }
+.fc-restart-all {
+  background: none; border: 1px solid var(--border); color: var(--text-muted);
+  padding: 7px 16px; border-radius: 9px; font-size: 12px; cursor: pointer;
+}
+.fc-restart-all:hover { color: var(--text); }
+
 /* Cabeçalho de categoria */
 .test-category {
   display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
@@ -860,16 +1058,16 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
 }
 
 /* ================================================================
-   YGGDRASIL — ANIMAÇÃO DA ÁRVORE
+   YGGDRASIL — ANIMAÇÃO
    ================================================================ */
 @keyframes ygg-pulse {
-  0%, 100% { filter: drop-shadow(0 0 4px rgba(123,116,224,.35)); }
-  50%       { filter: drop-shadow(0 0 12px rgba(123,116,224,.8)) drop-shadow(0 0 28px rgba(123,116,224,.22)); }
+  0%,100%{ filter: drop-shadow(0 0 5px rgba(123,116,224,.45)); }
+  50%     { filter: drop-shadow(0 0 14px rgba(123,116,224,.9)) drop-shadow(0 0 30px rgba(123,116,224,.3)); }
 }
 .ygg-tree { animation: ygg-pulse 4s ease-in-out infinite; }
 
 /* ================================================================
-   LOGIN — FUNDO COM ORBES FLUTUANTES
+   LOGIN — FUNDO COM ORBES (opacidade visível)
    ================================================================ */
 @keyframes orb-float-1 {
   0%,100%{ transform:translate(0,0) scale(1); }
@@ -889,22 +1087,22 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
   position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden;
 }
 .login-bg-orb {
-  position:absolute; border-radius:50%; filter:blur(100px);
+  position:absolute; border-radius:50%; filter:blur(80px);
 }
 .login-bg-orb-1 {
-  width:560px; height:560px; opacity:.055;
+  width:520px; height:520px; opacity:.14;
   background:radial-gradient(circle,#7B74E0 0%,transparent 60%);
-  top:-170px; left:-170px;
+  top:-160px; left:-160px;
   animation:orb-float-1 22s ease-in-out infinite;
 }
 .login-bg-orb-2 {
-  width:440px; height:440px; opacity:.04;
+  width:420px; height:420px; opacity:.10;
   background:radial-gradient(circle,#4B9EE8 0%,transparent 60%);
-  bottom:-140px; right:-140px;
+  bottom:-130px; right:-130px;
   animation:orb-float-2 28s ease-in-out infinite;
 }
 .login-bg-orb-3 {
-  width:300px; height:300px; opacity:.03;
+  width:280px; height:280px; opacity:.07;
   background:radial-gradient(circle,#3DBF80 0%,transparent 60%);
   top:50%; left:50%;
   animation:orb-float-3 20s ease-in-out infinite;
@@ -912,66 +1110,56 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
 #screen-login { position:relative; }
 .login-box    { position:relative; z-index:1; }
 #screen-login .login-box {
-  box-shadow:0 0 0 1px var(--border), 0 24px 80px rgba(0,0,0,.65);
+  box-shadow:0 0 0 1px rgba(123,116,224,.2), 0 24px 80px rgba(0,0,0,.7),
+             0 0 80px rgba(123,116,224,.06);
   transition:box-shadow 0.5s ease;
 }
 #screen-login .login-box:hover {
-  box-shadow:0 0 0 1px rgba(123,116,224,.22), 0 28px 100px rgba(0,0,0,.7), 0 0 60px rgba(123,116,224,.05);
+  box-shadow:0 0 0 1px rgba(123,116,224,.35), 0 28px 100px rgba(0,0,0,.75),
+             0 0 100px rgba(123,116,224,.1);
 }
 .login-logo {
-  width:72px !important; height:80px !important;
-  background:transparent !important;
-  border:none !important;
+  width:74px !important; height:82px !important;
+  background:transparent !important; border:none !important;
   margin-bottom:16px !important;
 }
 
 /* ================================================================
-   DASHBOARD — TOPBAR
+   DASHBOARD — VISUAL
    ================================================================ */
 .dash-top {
-  background:linear-gradient(135deg,#0E0E0E 0%,#090909 100%) !important;
-  border-bottom:1px solid #1A1A1A !important;
+  background:linear-gradient(135deg,#0D0D0D 0%,#080808 100%) !important;
+  border-bottom:1px solid rgba(123,116,224,.1) !important;
   padding:14px 36px !important;
 }
-.dash-brand {
-  gap:12px !important;
-}
-
-/* ================================================================
-   PATIENT CARDS — UPGRADE VISUAL
-   ================================================================ */
+.dash-brand { gap:12px !important; }
 .patient-card {
-  background:linear-gradient(158deg,#141414 0%,#101010 100%) !important;
-  border:1px solid #232323 !important;
-  border-radius:12px !important;
+  background:linear-gradient(158deg,#141414 0%,#0F0F0F 100%) !important;
+  border:1px solid #242424 !important; border-radius:12px !important;
   padding:20px 22px !important;
-  transition:border-color .3s ease,transform .25s ease,box-shadow .3s ease !important;
+  transition:border-color .3s,transform .25s,box-shadow .3s !important;
 }
 .patient-card:hover {
-  border-color:#353535 !important;
+  border-color:rgba(123,116,224,.35) !important;
   transform:translateY(-3px) !important;
-  box-shadow:0 10px 35px rgba(0,0,0,.45) !important;
+  box-shadow:0 10px 35px rgba(0,0,0,.5), 0 0 0 1px rgba(123,116,224,.1) !important;
 }
 .pc-name { font-size:16px !important; font-weight:600 !important; }
 .metric-card {
-  background:linear-gradient(158deg,#141414 0%,#101010 100%) !important;
-  border-radius:12px !important;
-  padding:18px 20px !important;
+  background:linear-gradient(158deg,#141414 0%,#0F0F0F 100%) !important;
+  border-radius:12px !important; padding:18px 20px !important;
   transition:transform .25s,box-shadow .25s !important;
+  border-color:#242424 !important;
 }
-.metric-card:hover { transform:translateY(-2px) !important; box-shadow:0 8px 28px rgba(0,0,0,.4) !important; }
+.metric-card:hover { transform:translateY(-2px) !important; box-shadow:0 8px 28px rgba(0,0,0,.45) !important; }
 .metric-val { font-size:30px !important; font-weight:700 !important; font-family:var(--mono) !important; }
-.dash-filters input {
-  background:linear-gradient(158deg,#141414 0%,#111 100%) !important;
-  border-radius:10px !important; padding:11px 16px !important;
-}
 
 /* ================================================================
    EMPTY STATE — REDESENHADO
    ================================================================ */
 @keyframes ring-breathe {
-  0%,100%{ opacity:.1; }
-  50%    { opacity:.4; }
+  0%,100%{ opacity:.12; }
+  50%    { opacity:.45; }
 }
 .empty-v2 {
   grid-column:1/-1; display:flex; flex-direction:column;
@@ -984,133 +1172,129 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
 }
 .empty-ring {
   position:absolute; border-radius:50%;
-  border:1px solid rgba(123,116,224,.14);
+  border:1px solid rgba(123,116,224,.15);
   animation:ring-breathe 5s ease-in-out infinite;
   top:50%; left:50%;
 }
-.empty-ring-1 { width:140px;height:140px; margin:-70px 0 0 -70px; animation-delay:0s; }
-.empty-ring-2 { width:190px;height:190px; margin:-95px 0 0 -95px; animation-delay:1.8s; }
-.empty-ring-3 { width:240px;height:240px; margin:-120px 0 0 -120px; animation-delay:3.6s; }
+.empty-ring-1 { width:140px;height:140px;margin:-70px 0 0 -70px;animation-delay:0s; }
+.empty-ring-2 { width:190px;height:190px;margin:-95px 0 0 -95px;animation-delay:1.8s; }
+.empty-ring-3 { width:240px;height:240px;margin:-120px 0 0 -120px;animation-delay:3.6s; }
 .empty-quote-area { max-width:460px; margin-bottom:36px; }
 .empty-quote-txt {
   font-size:15px; color:var(--text-muted); line-height:1.85;
-  font-style:italic; margin-bottom:10px;
-  transition:opacity .55s ease;
+  font-style:italic; margin-bottom:10px; transition:opacity .55s ease;
 }
 .empty-quote-auth {
   font-size:11px; color:var(--text-faint);
-  letter-spacing:.07em; text-transform:uppercase;
-  transition:opacity .55s ease;
+  letter-spacing:.07em; text-transform:uppercase; transition:opacity .55s ease;
 }
-.empty-hint { font-size:12px; color:var(--text-faint); margin-top:14px; max-width:360px; }
+.empty-hint { font-size:12px;color:var(--text-faint);margin-top:14px;max-width:360px; }
 
 /* ================================================================
-   REPORT — REDESIGN VISUAL COMPLETO
+   REPORT — REDESIGN VISUAL DRAMÁTICO
    ================================================================ */
+/* Fundo do relatório */
 .report {
-  background:#090909 !important;
+  background:#080808 !important;
   border:1px solid #1E1E1E !important;
   border-radius:16px !important;
-  overflow:hidden;
 }
+/* Header com gradiente roxo profundo */
 .rpt-header {
-  background:linear-gradient(135deg,#131320 0%,#0E0E18 100%) !important;
-  border-bottom:1px solid rgba(123,116,224,.12) !important;
-  padding:22px 28px !important;
+  background:linear-gradient(135deg,#0F0F2A 0%,#0C0C1E 50%,#08080F 100%) !important;
+  border-bottom:2px solid rgba(123,116,224,.25) !important;
+  padding:24px 28px !important;
 }
 .rpt-label {
-  font-size:10px !important; letter-spacing:0.14em !important;
-  text-transform:uppercase !important; color:var(--purple-lt) !important;
-  margin-bottom:5px !important; font-weight:600 !important;
-}
-.rpt-name {
-  font-size:26px !important; font-weight:700 !important;
-  letter-spacing:-0.5px !important;
-}
-.rpt-content { padding:16px 16px 0 !important; }
-.card {
-  background:linear-gradient(158deg,#141414 0%,#101010 100%) !important;
-  border:1px solid #232323 !important;
-  border-radius:13px !important;
-  padding:18px 20px !important;
-  position:relative; overflow:hidden;
-  transition:border-color .35s ease, box-shadow .35s ease, transform .25s ease !important;
-}
-.card::before {
-  content:'';
-  position:absolute; inset:0; pointer-events:none;
-  background:linear-gradient(135deg,rgba(123,116,224,.025) 0%,transparent 55%);
-  border-radius:12px;
-}
-.card:hover {
-  border-color:#313131 !important;
-  box-shadow:0 0 0 1px rgba(123,116,224,.08), 0 14px 44px rgba(0,0,0,.45) !important;
-  transform:translateY(-1px);
-}
-.card-title {
-  font-size:10px !important; letter-spacing:0.13em !important;
-  color:#585858 !important; margin-bottom:18px !important;
+  font-size:10px !important; letter-spacing:.16em !important;
+  color:var(--purple-lt) !important; margin-bottom:5px !important;
   font-weight:700 !important; text-transform:uppercase !important;
 }
+.rpt-name { font-size:26px !important; font-weight:700 !important; letter-spacing:-.5px !important; }
+/* Todos os cards — borda esquerda roxa visível */
+.card {
+  background:linear-gradient(158deg,#131313 0%,#0E0E0E 100%) !important;
+  border:1px solid #242424 !important;
+  border-left:3px solid rgba(123,116,224,.4) !important;
+  border-radius:12px !important; padding:20px 22px !important;
+  position:relative; overflow:hidden;
+  transition:border-color .35s,box-shadow .35s,transform .25s !important;
+}
+.card:hover {
+  border-color:#333 !important;
+  border-left-color:rgba(123,116,224,.75) !important;
+  box-shadow:-3px 0 20px rgba(123,116,224,.1), 0 12px 40px rgba(0,0,0,.5) !important;
+  transform:translateY(-1px);
+}
+.card::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(135deg,rgba(123,116,224,.03) 0%,transparent 50%);
+}
+.card-title {
+  font-size:10px !important; letter-spacing:.14em !important;
+  color:#5A5A5A !important; margin-bottom:18px !important;
+  font-weight:700 !important; text-transform:uppercase !important;
+}
+/* Números grandes dos scores */
 .score-big {
-  font-size:56px !important; font-weight:700 !important;
+  font-size:58px !important; font-weight:700 !important;
   line-height:1 !important; letter-spacing:-2.5px !important;
   font-family:var(--mono) !important; margin-bottom:4px !important;
+  text-shadow:0 0 30px rgba(255,255,255,.07) !important;
 }
 .score-max { font-size:12px !important; color:var(--text-faint) !important; margin-bottom:12px !important; }
-.score-ranges { margin-top:10px !important; font-size:10px !important; color:var(--text-faint) !important; line-height:1.85 !important; }
+/* Barras de progresso mais grossas */
 .prog-track {
-  height:7px !important; background:#1C1C1C !important;
+  height:8px !important; background:#1A1A1A !important;
   border-radius:99px; overflow:hidden; margin-top:14px !important;
 }
-.prog-fill { height:100%; border-radius:99px; }
+/* Cards de domínio QV */
 .qv-domain {
   border-radius:10px; padding:13px 14px;
-  transition:transform .25s ease, box-shadow .25s ease;
+  transition:transform .25s,box-shadow .25s;
 }
-.qv-domain:hover { transform:translateY(-2px); box-shadow:0 6px 22px rgba(0,0,0,.38); }
+.qv-domain:hover { transform:translateY(-2px); box-shadow:0 6px 22px rgba(0,0,0,.4); }
 .qv-domain-score { font-size:28px !important; font-weight:700 !important; letter-spacing:-1px !important; }
 .qv-overall {
-  background:#141414 !important; border:1px solid #1E1E1E !important;
+  background:#131313 !important; border:1px solid #1E1E1E !important;
   border-radius:10px !important; padding:12px 16px !important;
 }
+/* Summary — blocos com borda superior colorida */
 .summary {
-  margin:0 16px 16px !important;
-  border:1px solid #232323 !important;
-  background:#0A0A0A !important;
-  border-radius:13px !important; overflow:hidden;
+  margin:0 16px 16px !important; border:1px solid #222 !important;
+  background:#090909 !important; border-radius:13px !important; overflow:hidden;
 }
 .summary-hdr {
-  background:linear-gradient(135deg,#161616 0%,#111 100%) !important;
-  border-bottom:1px solid #222 !important;
-  padding:12px 20px !important;
-  font-size:10px !important; font-weight:700 !important;
-  letter-spacing:0.14em !important; text-transform:uppercase !important;
-  color:#525252 !important;
+  background:linear-gradient(90deg,rgba(123,116,224,.1) 0%,rgba(123,116,224,.02) 100%) !important;
+  border-bottom:1px solid rgba(123,116,224,.15) !important;
+  padding:12px 20px !important; font-size:10px !important;
+  font-weight:700 !important; letter-spacing:.14em !important;
+  text-transform:uppercase !important; color:#606060 !important;
 }
+.summary-body { display:grid; grid-template-columns:1fr 1fr; }
 .summary-block {
-  position:relative;
-  padding:20px 22px !important;
-  transition:background .2s ease;
+  padding:20px 22px !important; position:relative;
+  transition:background .2s; border-right:1px solid #1A1A1A;
+  border-bottom:1px solid #1A1A1A;
 }
-.summary-block::before {
-  content:''; position:absolute; top:0; left:0; right:0;
-  height:2px; border-radius:0;
-}
-.summary-block:nth-child(1)::before { background:linear-gradient(90deg,var(--purple),transparent); }
-.summary-block:nth-child(2)::before { background:linear-gradient(90deg,var(--red),transparent); }
-.summary-block:nth-child(3)::before { background:linear-gradient(90deg,var(--green),transparent); }
-.summary-block:nth-child(4)::before { background:linear-gradient(90deg,var(--amber),transparent); }
-.summary-block:hover { background:#111 !important; }
+.summary-block:nth-child(even) { border-right:none; }
+.summary-block:nth-last-child(-n+2) { border-bottom:none; }
+/* Borda superior colorida em cada bloco */
+.summary-block:nth-child(1){ border-top:3px solid var(--purple) !important; }
+.summary-block:nth-child(2){ border-top:3px solid var(--red) !important; }
+.summary-block:nth-child(3){ border-top:3px solid var(--green) !important; }
+.summary-block:nth-child(4){ border-top:3px solid var(--amber) !important; }
+.summary-block:hover { background:#0F0F0F !important; }
 .summary-ttl {
   font-size:10px !important; font-weight:700 !important;
-  color:#525252 !important; margin-bottom:10px !important;
-  letter-spacing:0.08em !important; text-transform:uppercase !important;
+  color:#5A5A5A !important; margin-bottom:10px !important;
+  letter-spacing:.09em !important; text-transform:uppercase !important;
 }
-.summary-txt { font-size:13px !important; line-height:1.75 !important; color:#D0D0CE !important; }
+.summary-txt { font-size:13px !important; line-height:1.75 !important; color:#D2D2D0 !important; }
+/* Rodapé */
 .rpt-footer {
-  border-top:1px solid #1A1A1A !important;
-  background:#0A0A0A !important; padding:10px 26px !important;
+  border-top:1px solid #1A1A1A !important; background:#080808 !important;
+  padding:10px 26px !important;
 }
 </style>
 </head>
@@ -1130,65 +1314,54 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
       <div class="login-logo">
         <svg class="ygg-tree" width="52" height="66" viewBox="0 0 50 65" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <filter id="ygg-glow-login" x="-30%" y="-30%" width="160%" height="160%">
+            <filter id="ygg-f-login" x="-40%" y="-40%" width="180%" height="180%">
               <feGaussianBlur stdDeviation="1.4" result="blur"/>
               <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
           </defs>
-          <g filter="url(#ygg-glow-login)">
-            <!-- Tronco principal -->
-            <path d="M 25,61 L 25,9" stroke="#7B74E0" stroke-width="2.8" stroke-linecap="round"/>
-            <!-- Galhos superiores L1 -->
-            <path d="M 25,12 Q 18,8 10,4"  stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity="0.95"/>
-            <path d="M 25,12 Q 32,8 40,4"  stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity="0.95"/>
-            <!-- Galhos superiores L2 -->
-            <path d="M 25,18 Q 17,14 10,10" stroke="#A9A3E8" stroke-width="1.8" stroke-linecap="round" opacity="0.82"/>
-            <path d="M 25,18 Q 33,14 40,10" stroke="#A9A3E8" stroke-width="1.8" stroke-linecap="round" opacity="0.82"/>
-            <!-- Galhos médios L3 -->
-            <path d="M 25,25 Q 19,22 13,18"  stroke="#A9A3E8" stroke-width="1.5" stroke-linecap="round" opacity="0.65"/>
-            <path d="M 25,25 Q 31,22 37,18"  stroke="#A9A3E8" stroke-width="1.5" stroke-linecap="round" opacity="0.65"/>
-            <!-- Galhos baixos L4 -->
-            <path d="M 25,32 Q 21,30 16,27"  stroke="#A9A3E8" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
-            <path d="M 25,32 Q 29,30 34,27"  stroke="#A9A3E8" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
-            <!-- Nó do topo — Asgard -->
-            <circle cx="25" cy="8"  r="2.8" fill="none" stroke="#7B74E0"  stroke-width="1.5" opacity="0.8"/>
-            <circle cx="25" cy="8"  r="1.3" fill="#C4BFF0" opacity="0.95"/>
-            <!-- Nós nas pontas dos galhos -->
-            <circle cx="10" cy="4"  r="2.2" fill="#A9A3E8" opacity="0.9"/>
-            <circle cx="40" cy="4"  r="2.2" fill="#A9A3E8" opacity="0.9"/>
-            <circle cx="10" cy="10" r="1.8" fill="#7B74E0" opacity="0.78"/>
-            <circle cx="40" cy="10" r="1.8" fill="#7B74E0" opacity="0.78"/>
-            <circle cx="13" cy="18" r="1.4" fill="#7B74E0" opacity="0.62"/>
-            <circle cx="37" cy="18" r="1.4" fill="#7B74E0" opacity="0.62"/>
-            <circle cx="16" cy="27" r="1.1" fill="#7B74E0" opacity="0.45"/>
-            <circle cx="34" cy="27" r="1.1" fill="#7B74E0" opacity="0.45"/>
-            <!-- Raízes principais -->
-            <path d="M 25,56 Q 19,59 12,63"  stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity="0.88"/>
-            <path d="M 25,56 Q 31,59 38,63"  stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity="0.88"/>
-            <!-- Raízes laterais -->
-            <path d="M 25,59 Q 16,62 7,65"   stroke="#7B74E0" stroke-width="1.6" stroke-linecap="round" opacity="0.58"/>
-            <path d="M 25,59 Q 34,62 43,65"  stroke="#7B74E0" stroke-width="1.6" stroke-linecap="round" opacity="0.58"/>
-            <!-- Nós das raízes -->
-            <circle cx="12" cy="63" r="1.7" fill="#7B74E0" opacity="0.72"/>
-            <circle cx="38" cy="63" r="1.7" fill="#7B74E0" opacity="0.72"/>
-            <circle cx="7"  cy="65" r="1.3" fill="#7B74E0" opacity="0.5"/>
-            <circle cx="43" cy="65" r="1.3" fill="#7B74E0" opacity="0.5"/>
+          <g filter="url(#ygg-f-login)">
+            <path d="M25,61 L25,9"            stroke="#7B74E0" stroke-width="2.8" stroke-linecap="round"/>
+            <path d="M25,12 Q18,8  10,4"      stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity=".95"/>
+            <path d="M25,12 Q32,8  40,4"      stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity=".95"/>
+            <path d="M25,18 Q17,14 10,10"     stroke="#A9A3E8" stroke-width="1.8" stroke-linecap="round" opacity=".82"/>
+            <path d="M25,18 Q33,14 40,10"     stroke="#A9A3E8" stroke-width="1.8" stroke-linecap="round" opacity=".82"/>
+            <path d="M25,25 Q19,22 13,18"     stroke="#A9A3E8" stroke-width="1.5" stroke-linecap="round" opacity=".65"/>
+            <path d="M25,25 Q31,22 37,18"     stroke="#A9A3E8" stroke-width="1.5" stroke-linecap="round" opacity=".65"/>
+            <path d="M25,32 Q21,30 16,27"     stroke="#A9A3E8" stroke-width="1.2" stroke-linecap="round" opacity=".45"/>
+            <path d="M25,32 Q29,30 34,27"     stroke="#A9A3E8" stroke-width="1.2" stroke-linecap="round" opacity=".45"/>
+            <circle cx="25" cy="8"  r="2.8" fill="none" stroke="#7B74E0" stroke-width="1.5" opacity=".8"/>
+            <circle cx="25" cy="8"  r="1.3" fill="#C4BFF0" opacity=".95"/>
+            <circle cx="10" cy="4"  r="2.2" fill="#A9A3E8" opacity=".9"/>
+            <circle cx="40" cy="4"  r="2.2" fill="#A9A3E8" opacity=".9"/>
+            <circle cx="10" cy="10" r="1.8" fill="#7B74E0" opacity=".78"/>
+            <circle cx="40" cy="10" r="1.8" fill="#7B74E0" opacity=".78"/>
+            <circle cx="13" cy="18" r="1.4" fill="#7B74E0" opacity=".62"/>
+            <circle cx="37" cy="18" r="1.4" fill="#7B74E0" opacity=".62"/>
+            <circle cx="16" cy="27" r="1.1" fill="#7B74E0" opacity=".44"/>
+            <circle cx="34" cy="27" r="1.1" fill="#7B74E0" opacity=".44"/>
+            <path d="M25,56 Q19,59 12,63"     stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity=".88"/>
+            <path d="M25,56 Q31,59 38,63"     stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity=".88"/>
+            <path d="M25,59 Q16,62  7,65"     stroke="#7B74E0" stroke-width="1.6" stroke-linecap="round" opacity=".58"/>
+            <path d="M25,59 Q34,62 43,65"     stroke="#7B74E0" stroke-width="1.6" stroke-linecap="round" opacity=".58"/>
+            <circle cx="12" cy="63" r="1.7" fill="#7B74E0" opacity=".72"/>
+            <circle cx="38" cy="63" r="1.7" fill="#7B74E0" opacity=".72"/>
+            <circle cx="7"  cy="65" r="1.3" fill="#7B74E0" opacity=".5"/>
+            <circle cx="43" cy="65" r="1.3" fill="#7B74E0" opacity=".5"/>
           </g>
-          <!-- Energia subindo das raízes ao topo -->
           <circle cx="25" cy="59" r="1.8" fill="#C4BFF0" opacity="0">
             <animate attributeName="cy" from="59" to="9" dur="3.5s" repeatCount="indefinite" begin="0s"/>
-            <animate attributeName="r"  values="1.8;1.5;1.1;0.6" keyTimes="0;0.3;0.7;1" dur="3.5s" repeatCount="indefinite" begin="0s"/>
-            <animate attributeName="opacity" values="0;0.9;0.85;0" keyTimes="0;0.07;0.9;1" dur="3.5s" repeatCount="indefinite" begin="0s"/>
+            <animate attributeName="r"  values="1.8;1.5;1.1;0.5" keyTimes="0;.3;.7;1" dur="3.5s" repeatCount="indefinite" begin="0s"/>
+            <animate attributeName="opacity" values="0;.9;.85;0" keyTimes="0;.07;.9;1" dur="3.5s" repeatCount="indefinite" begin="0s"/>
           </circle>
           <circle cx="25" cy="59" r="1.4" fill="#A9A3E8" opacity="0">
             <animate attributeName="cy" from="59" to="9" dur="3.5s" repeatCount="indefinite" begin="1.17s"/>
-            <animate attributeName="r"  values="1.4;1.1;0.8;0.4" keyTimes="0;0.3;0.7;1" dur="3.5s" repeatCount="indefinite" begin="1.17s"/>
-            <animate attributeName="opacity" values="0;0.8;0.78;0" keyTimes="0;0.07;0.9;1" dur="3.5s" repeatCount="indefinite" begin="1.17s"/>
+            <animate attributeName="r"  values="1.4;1.1;0.8;0.3" keyTimes="0;.3;.7;1" dur="3.5s" repeatCount="indefinite" begin="1.17s"/>
+            <animate attributeName="opacity" values="0;.8;.78;0" keyTimes="0;.07;.9;1" dur="3.5s" repeatCount="indefinite" begin="1.17s"/>
           </circle>
           <circle cx="25" cy="59" r="1.6" fill="#7B74E0" opacity="0">
             <animate attributeName="cy" from="59" to="9" dur="3.5s" repeatCount="indefinite" begin="2.34s"/>
-            <animate attributeName="r"  values="1.6;1.3;0.9;0.5" keyTimes="0;0.3;0.7;1" dur="3.5s" repeatCount="indefinite" begin="2.34s"/>
-            <animate attributeName="opacity" values="0;0.85;0.82;0" keyTimes="0;0.07;0.9;1" dur="3.5s" repeatCount="indefinite" begin="2.34s"/>
+            <animate attributeName="r"  values="1.6;1.3;0.9;0.4" keyTimes="0;.3;.7;1" dur="3.5s" repeatCount="indefinite" begin="2.34s"/>
+            <animate attributeName="opacity" values="0;.85;.82;0" keyTimes="0;.07;.9;1" dur="3.5s" repeatCount="indefinite" begin="2.34s"/>
           </circle>
         </svg>
       </div>
@@ -1227,31 +1400,31 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
     <div class="dash-brand">
       <svg class="ygg-tree" width="24" height="30" viewBox="0 0 50 65" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g stroke="#7B74E0" stroke-linecap="round">
-          <path d="M 25,61 L 25,9"         stroke-width="2.8"/>
-          <path d="M 25,12 Q 18,8 10,4"    stroke-width="2.2" opacity="0.95"/>
-          <path d="M 25,12 Q 32,8 40,4"    stroke-width="2.2" opacity="0.95"/>
-          <path d="M 25,18 Q 17,14 10,10"  stroke-width="1.8" opacity="0.8"  stroke="#A9A3E8"/>
-          <path d="M 25,18 Q 33,14 40,10"  stroke-width="1.8" opacity="0.8"  stroke="#A9A3E8"/>
-          <path d="M 25,25 Q 19,22 14,18"  stroke-width="1.4" opacity="0.6"  stroke="#A9A3E8"/>
-          <path d="M 25,25 Q 31,22 36,18"  stroke-width="1.4" opacity="0.6"  stroke="#A9A3E8"/>
-          <path d="M 25,56 Q 19,59 12,63"  stroke-width="2.2" opacity="0.88"/>
-          <path d="M 25,56 Q 31,59 38,63"  stroke-width="2.2" opacity="0.88"/>
-          <path d="M 25,59 Q 16,62 7,65"   stroke-width="1.5" opacity="0.55"/>
-          <path d="M 25,59 Q 34,62 43,65"  stroke-width="1.5" opacity="0.55"/>
+          <path d="M25,61 L25,9"         stroke-width="2.8"/>
+          <path d="M25,12 Q18,8  10,4"   stroke-width="2.2" opacity=".95"/>
+          <path d="M25,12 Q32,8  40,4"   stroke-width="2.2" opacity=".95"/>
+          <path d="M25,18 Q17,14 10,10"  stroke-width="1.8" opacity=".8"  stroke="#A9A3E8"/>
+          <path d="M25,18 Q33,14 40,10"  stroke-width="1.8" opacity=".8"  stroke="#A9A3E8"/>
+          <path d="M25,25 Q19,22 14,18"  stroke-width="1.4" opacity=".6"  stroke="#A9A3E8"/>
+          <path d="M25,25 Q31,22 36,18"  stroke-width="1.4" opacity=".6"  stroke="#A9A3E8"/>
+          <path d="M25,56 Q19,59 12,63"  stroke-width="2.2" opacity=".88"/>
+          <path d="M25,56 Q31,59 38,63"  stroke-width="2.2" opacity=".88"/>
+          <path d="M25,59 Q16,62  7,65"  stroke-width="1.5" opacity=".55"/>
+          <path d="M25,59 Q34,62 43,65"  stroke-width="1.5" opacity=".55"/>
         </g>
-        <circle cx="25" cy="8"  r="2.5" fill="none" stroke="#7B74E0" stroke-width="1.4" opacity="0.8"/>
-        <circle cx="25" cy="8"  r="1.1" fill="#C4BFF0" opacity="0.95"/>
-        <circle cx="10" cy="4"  r="1.9" fill="#A9A3E8" opacity="0.88"/>
-        <circle cx="40" cy="4"  r="1.9" fill="#A9A3E8" opacity="0.88"/>
-        <circle cx="12" cy="63" r="1.5" fill="#7B74E0" opacity="0.7"/>
-        <circle cx="38" cy="63" r="1.5" fill="#7B74E0" opacity="0.7"/>
+        <circle cx="25" cy="8"  r="2.5" fill="none" stroke="#7B74E0" stroke-width="1.4" opacity=".8"/>
+        <circle cx="25" cy="8"  r="1.1" fill="#C4BFF0" opacity=".95"/>
+        <circle cx="10" cy="4"  r="1.9" fill="#A9A3E8" opacity=".88"/>
+        <circle cx="40" cy="4"  r="1.9" fill="#A9A3E8" opacity=".88"/>
+        <circle cx="12" cy="63" r="1.5" fill="#7B74E0" opacity=".7"/>
+        <circle cx="38" cy="63" r="1.5" fill="#7B74E0" opacity=".7"/>
         <circle cx="25" cy="59" r="1.5" fill="#A9A3E8" opacity="0">
           <animate attributeName="cy" from="59" to="9" dur="3.5s" repeatCount="indefinite" begin="0s"/>
-          <animate attributeName="opacity" values="0;0.88;0.85;0" keyTimes="0;0.07;0.9;1" dur="3.5s" repeatCount="indefinite" begin="0s"/>
+          <animate attributeName="opacity" values="0;.88;.85;0" keyTimes="0;.07;.9;1" dur="3.5s" repeatCount="indefinite" begin="0s"/>
         </circle>
         <circle cx="25" cy="59" r="1.1" fill="#7B74E0" opacity="0">
           <animate attributeName="cy" from="59" to="9" dur="3.5s" repeatCount="indefinite" begin="1.75s"/>
-          <animate attributeName="opacity" values="0;0.75;0.72;0" keyTimes="0;0.07;0.9;1" dur="3.5s" repeatCount="indefinite" begin="1.75s"/>
+          <animate attributeName="opacity" values="0;.75;.72;0" keyTimes="0;.07;.9;1" dur="3.5s" repeatCount="indefinite" begin="1.75s"/>
         </circle>
       </svg>
       Scanner de Performance
@@ -1301,8 +1474,9 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
     </div>
     <div class="scanner-top-right">
       <div class="scanner-tabs">
-        <button class="scanner-tab active" id="tab-relatorio" onclick="switchTab('relatorio')">Relatório</button>
-        <button class="scanner-tab"        id="tab-testes"    onclick="switchTab('testes')">Testes Cognitivos</button>
+        <button class="scanner-tab active" id="tab-relatorio"  onclick="switchTab('relatorio')">Relatório</button>
+        <button class="scanner-tab"        id="tab-testes"     onclick="switchTab('testes')">Testes Cognitivos</button>
+        <button class="scanner-tab"        id="tab-flashcards" onclick="switchTab('flashcards')">Flashcards</button>
       </div>
       <span class="save-status" id="save-status"></span>
       <button class="btn-pdf" id="btn-pdf" onclick="downloadPDF()">
@@ -1743,6 +1917,129 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
 
   </div><!-- fim tests-panel -->
 
+  <!-- ══ PAINEL FLASHCARDS ══════════════════════════════════════════════ -->
+  <div id="flashcards-panel">
+    <!-- Header da área -->
+    <div class="fc-area-header">
+      <div class="fc-area-title">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Biblioteca de Flashcards
+      </div>
+      <div class="fc-area-sub">Estudo e revisão de conteúdo clínico · Selecione um deck para começar</div>
+    </div>
+
+    <!-- Seletor de deck -->
+    <div class="fc-deck-selector" id="fc-deck-selector">
+      <div class="fc-deck-card" onclick="openFlashcardDeck('sport')">
+        <div class="fc-deck-icon">🧠</div>
+        <div class="fc-deck-info">
+          <div class="fc-deck-name">Sport Psych</div>
+          <div class="fc-deck-meta">55 cards · 8 categorias</div>
+          <div class="fc-deck-tags">
+            <span class="fc-tag" style="background:rgba(108,142,245,.18);color:#6c8ef5;">Regulação Emocional</span>
+            <span class="fc-tag" style="background:rgba(167,139,250,.18);color:#a78bfa;">TCC</span>
+            <span class="fc-tag" style="background:rgba(56,189,248,.18);color:#38bdf8;">Atenção</span>
+            <span class="fc-tag" style="background:rgba(251,146,60,.18);color:#fb923c;">+5</span>
+          </div>
+        </div>
+        <div class="fc-deck-arrow">→</div>
+      </div>
+
+      <div class="fc-deck-card" onclick="openFlashcardDeck('psicanalise')">
+        <div class="fc-deck-icon">🛋️</div>
+        <div class="fc-deck-info">
+          <div class="fc-deck-name">Psicanálise Clínica</div>
+          <div class="fc-deck-meta">35 cards · 6 categorias</div>
+          <div class="fc-deck-tags">
+            <span class="fc-tag" style="background:rgba(192,132,252,.18);color:#c084fc;">Estrutural</span>
+            <span class="fc-tag" style="background:rgba(244,114,182,.18);color:#f472b6;">Sintoma</span>
+            <span class="fc-tag" style="background:rgba(56,189,248,.18);color:#38bdf8;">Transferência</span>
+            <span class="fc-tag" style="background:rgba(52,211,153,.18);color:#34d399;">+3</span>
+          </div>
+        </div>
+        <div class="fc-deck-arrow">→</div>
+      </div>
+    </div>
+
+    <!-- Área de estudo (oculta até selecionar deck) -->
+    <div id="fc-study-area" style="display:none;">
+      <div class="fc-study-header">
+        <button class="fc-back-btn" onclick="closeFlashcardDeck()">← Voltar aos decks</button>
+        <div class="fc-deck-title-bar">
+          <span id="fc-deck-title">—</span>
+          <span id="fc-deck-desc" style="font-size:12px;color:var(--text-muted);margin-left:10px;"></span>
+        </div>
+      </div>
+
+      <!-- Tabs de categoria -->
+      <div class="fc-tabs" id="fc-tabs-bar"></div>
+
+      <!-- Progresso -->
+      <div class="fc-progress-wrap">
+        <div class="fc-progress-row">
+          <span id="fc-card-counter">Card 1 / 1</span>
+          <span id="fc-pct">0%</span>
+        </div>
+        <div class="fc-bar-bg"><div class="fc-bar-fill" id="fc-bar-fill" style="width:0%"></div></div>
+      </div>
+
+      <!-- Card flip -->
+      <div class="fc-scene" id="fc-scene" onclick="fcToggleFlip()">
+        <div class="fc-card" id="fc-card">
+          <div class="fc-face fc-front">
+            <span class="fc-face-label">Pergunta</span>
+            <div class="fc-badge" id="fc-front-badge"></div>
+            <p class="fc-question" id="fc-question-text"></p>
+            <p class="fc-hint" id="fc-front-hint">Clique para revelar a resposta</p>
+            <span class="fc-flip-icon">↻</span>
+          </div>
+          <div class="fc-face fc-back">
+            <span class="fc-face-label">Resposta — clique para reler a pergunta</span>
+            <div class="fc-badge" id="fc-back-badge"></div>
+            <div id="fc-answer-body" class="fc-answer-body"></div>
+            <span class="fc-flip-icon">↻</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rating -->
+      <div class="fc-rating" id="fc-rating-btns" style="display:none;">
+        <button class="fc-btn-hard" onclick="fcRate('hard')">😬 Difícil</button>
+        <button class="fc-btn-ok"   onclick="fcRate('ok')">🤔 Ok</button>
+        <button class="fc-btn-easy" onclick="fcRate('easy')">✅ Fácil</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="fc-stats" id="fc-stats-bar">
+        Difícil: <span id="fc-s-hard">0</span> &nbsp;|&nbsp;
+        Ok: <span id="fc-s-ok">0</span> &nbsp;|&nbsp;
+        Fácil: <span id="fc-s-easy">0</span> &nbsp;|&nbsp;
+        Restantes: <span id="fc-s-left">—</span>
+      </div>
+
+      <!-- Controles -->
+      <div class="fc-controls">
+        <button class="fc-ctrl-btn" onclick="fcPrevCard()">← Anterior</button>
+        <button class="fc-ctrl-btn" onclick="fcShuffle()">🔀 Embaralhar</button>
+        <button class="fc-ctrl-btn" onclick="fcResetDeck()">↺ Reiniciar</button>
+      </div>
+
+      <!-- Tela de conclusão -->
+      <div class="fc-done" id="fc-done-screen">
+        <h2>🎯 Deck concluído!</h2>
+        <p>Ótimo trabalho. Veja seu desempenho.<br>
+        <strong style="color:#f87171;">Difíceis</strong> serão priorizados na próxima rodada.</p>
+        <div class="fc-score-row">
+          <div class="fc-score-item"><div class="fc-score-num" id="fc-d-hard" style="color:#f87171;">0</div><div class="fc-score-lbl">Difícil</div></div>
+          <div class="fc-score-item"><div class="fc-score-num" id="fc-d-ok"   style="color:#fbbf24;">0</div><div class="fc-score-lbl">Ok</div></div>
+          <div class="fc-score-item"><div class="fc-score-num" id="fc-d-easy" style="color:#34d399;">0</div><div class="fc-score-lbl">Fácil</div></div>
+        </div>
+        <button class="fc-restart-btn" onclick="fcRestartWithHard()">Revisar os Difíceis →</button><br>
+        <button class="fc-restart-all" onclick="fcResetDeck()">Reiniciar deck completo</button>
+      </div>
+    </div>
+  </div><!-- fim flashcards-panel -->
+
 </div><!-- fim screen-scanner -->
 
 <!-- ══════════════════════════════════════════════════════════════
@@ -2027,64 +2324,63 @@ async function loadSessions() {
       { text: '"A mente que se abre a uma nova ideia jamais voltará ao seu tamanho original."', author: '— Albert Einstein' },
       { text: '"O atleta de alta performance não é aquele que nunca falha, mas o que sabe como se recuperar."', author: '— Psicologia do Esporte' },
     ];
+    const yggSVG = `<svg class="ygg-tree" width="72" height="92" viewBox="0 0 50 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs><filter id="ygg-f-empty" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="1.5" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter></defs>
+      <g filter="url(#ygg-f-empty)">
+        <path d="M25,61 L25,9"        stroke="#7B74E0" stroke-width="2.8" stroke-linecap="round"/>
+        <path d="M25,12 Q18,8  10,4"  stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity=".95"/>
+        <path d="M25,12 Q32,8  40,4"  stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity=".95"/>
+        <path d="M25,18 Q17,14 10,10" stroke="#A9A3E8" stroke-width="1.8" stroke-linecap="round" opacity=".82"/>
+        <path d="M25,18 Q33,14 40,10" stroke="#A9A3E8" stroke-width="1.8" stroke-linecap="round" opacity=".82"/>
+        <path d="M25,25 Q19,22 13,18" stroke="#A9A3E8" stroke-width="1.5" stroke-linecap="round" opacity=".65"/>
+        <path d="M25,25 Q31,22 37,18" stroke="#A9A3E8" stroke-width="1.5" stroke-linecap="round" opacity=".65"/>
+        <path d="M25,32 Q21,30 16,27" stroke="#A9A3E8" stroke-width="1.2" stroke-linecap="round" opacity=".45"/>
+        <path d="M25,32 Q29,30 34,27" stroke="#A9A3E8" stroke-width="1.2" stroke-linecap="round" opacity=".45"/>
+        <circle cx="25" cy="8"  r="2.8" fill="none" stroke="#7B74E0" stroke-width="1.5" opacity=".8"/>
+        <circle cx="25" cy="8"  r="1.3" fill="#C4BFF0" opacity=".95"/>
+        <circle cx="10" cy="4"  r="2.2" fill="#A9A3E8" opacity=".9"/>
+        <circle cx="40" cy="4"  r="2.2" fill="#A9A3E8" opacity=".9"/>
+        <circle cx="10" cy="10" r="1.8" fill="#7B74E0" opacity=".78"/>
+        <circle cx="40" cy="10" r="1.8" fill="#7B74E0" opacity=".78"/>
+        <circle cx="13" cy="18" r="1.4" fill="#7B74E0" opacity=".62"/>
+        <circle cx="37" cy="18" r="1.4" fill="#7B74E0" opacity=".62"/>
+        <circle cx="16" cy="27" r="1.1" fill="#7B74E0" opacity=".44"/>
+        <circle cx="34" cy="27" r="1.1" fill="#7B74E0" opacity=".44"/>
+        <path d="M25,56 Q19,59 12,63" stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity=".88"/>
+        <path d="M25,56 Q31,59 38,63" stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity=".88"/>
+        <path d="M25,59 Q16,62  7,65" stroke="#7B74E0" stroke-width="1.6" stroke-linecap="round" opacity=".58"/>
+        <path d="M25,59 Q34,62 43,65" stroke="#7B74E0" stroke-width="1.6" stroke-linecap="round" opacity=".58"/>
+        <circle cx="12" cy="63" r="1.7" fill="#7B74E0" opacity=".72"/>
+        <circle cx="38" cy="63" r="1.7" fill="#7B74E0" opacity=".72"/>
+        <circle cx="7"  cy="65" r="1.3" fill="#7B74E0" opacity=".5"/>
+        <circle cx="43" cy="65" r="1.3" fill="#7B74E0" opacity=".5"/>
+      </g>
+      <circle cx="25" cy="59" r="1.8" fill="#C4BFF0" opacity="0">
+        <animate attributeName="cy" from="59" to="9" dur="3.5s" repeatCount="indefinite" begin="0s"/>
+        <animate attributeName="r" values="1.8;1.5;1.1;0.5" keyTimes="0;.3;.7;1" dur="3.5s" repeatCount="indefinite" begin="0s"/>
+        <animate attributeName="opacity" values="0;.9;.85;0" keyTimes="0;.07;.9;1" dur="3.5s" repeatCount="indefinite" begin="0s"/>
+      </circle>
+      <circle cx="25" cy="59" r="1.4" fill="#A9A3E8" opacity="0">
+        <animate attributeName="cy" from="59" to="9" dur="3.5s" repeatCount="indefinite" begin="1.17s"/>
+        <animate attributeName="r" values="1.4;1.1;0.8;0.3" keyTimes="0;.3;.7;1" dur="3.5s" repeatCount="indefinite" begin="1.17s"/>
+        <animate attributeName="opacity" values="0;.8;.78;0" keyTimes="0;.07;.9;1" dur="3.5s" repeatCount="indefinite" begin="1.17s"/>
+      </circle>
+      <circle cx="25" cy="59" r="1.6" fill="#7B74E0" opacity="0">
+        <animate attributeName="cy" from="59" to="9" dur="3.5s" repeatCount="indefinite" begin="2.34s"/>
+        <animate attributeName="r" values="1.6;1.3;0.9;0.4" keyTimes="0;.3;.7;1" dur="3.5s" repeatCount="indefinite" begin="2.34s"/>
+        <animate attributeName="opacity" values="0;.85;.82;0" keyTimes="0;.07;.9;1" dur="3.5s" repeatCount="indefinite" begin="2.34s"/>
+      </circle>
+    </svg>`;
     grid.innerHTML = `
       <div class="empty-v2" id="empty-v2-root">
         <div class="empty-ygg-area">
           <div class="empty-ring empty-ring-1"></div>
           <div class="empty-ring empty-ring-2"></div>
           <div class="empty-ring empty-ring-3"></div>
-          <svg class="ygg-tree" width="72" height="92" viewBox="0 0 50 65" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <filter id="ygg-glow-empty" x="-30%" y="-30%" width="160%" height="160%">
-                <feGaussianBlur stdDeviation="1.5" result="blur"/>
-                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-            </defs>
-            <g filter="url(#ygg-glow-empty)">
-              <path d="M 25,61 L 25,9"        stroke="#7B74E0" stroke-width="2.8" stroke-linecap="round"/>
-              <path d="M 25,12 Q 18,8 10,4"   stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity="0.95"/>
-              <path d="M 25,12 Q 32,8 40,4"   stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity="0.95"/>
-              <path d="M 25,18 Q 17,14 10,10" stroke="#A9A3E8" stroke-width="1.8" stroke-linecap="round" opacity="0.82"/>
-              <path d="M 25,18 Q 33,14 40,10" stroke="#A9A3E8" stroke-width="1.8" stroke-linecap="round" opacity="0.82"/>
-              <path d="M 25,25 Q 19,22 13,18" stroke="#A9A3E8" stroke-width="1.5" stroke-linecap="round" opacity="0.65"/>
-              <path d="M 25,25 Q 31,22 37,18" stroke="#A9A3E8" stroke-width="1.5" stroke-linecap="round" opacity="0.65"/>
-              <path d="M 25,32 Q 21,30 16,27" stroke="#A9A3E8" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
-              <path d="M 25,32 Q 29,30 34,27" stroke="#A9A3E8" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
-              <circle cx="25" cy="8"  r="2.8" fill="none" stroke="#7B74E0" stroke-width="1.5" opacity="0.8"/>
-              <circle cx="25" cy="8"  r="1.3" fill="#C4BFF0" opacity="0.95"/>
-              <circle cx="10" cy="4"  r="2.2" fill="#A9A3E8" opacity="0.9"/>
-              <circle cx="40" cy="4"  r="2.2" fill="#A9A3E8" opacity="0.9"/>
-              <circle cx="10" cy="10" r="1.8" fill="#7B74E0" opacity="0.78"/>
-              <circle cx="40" cy="10" r="1.8" fill="#7B74E0" opacity="0.78"/>
-              <circle cx="13" cy="18" r="1.4" fill="#7B74E0" opacity="0.62"/>
-              <circle cx="37" cy="18" r="1.4" fill="#7B74E0" opacity="0.62"/>
-              <circle cx="16" cy="27" r="1.1" fill="#7B74E0" opacity="0.45"/>
-              <circle cx="34" cy="27" r="1.1" fill="#7B74E0" opacity="0.45"/>
-              <path d="M 25,56 Q 19,59 12,63" stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity="0.88"/>
-              <path d="M 25,56 Q 31,59 38,63" stroke="#7B74E0" stroke-width="2.2" stroke-linecap="round" opacity="0.88"/>
-              <path d="M 25,59 Q 16,62 7,65"  stroke="#7B74E0" stroke-width="1.6" stroke-linecap="round" opacity="0.58"/>
-              <path d="M 25,59 Q 34,62 43,65" stroke="#7B74E0" stroke-width="1.6" stroke-linecap="round" opacity="0.58"/>
-              <circle cx="12" cy="63" r="1.7" fill="#7B74E0" opacity="0.72"/>
-              <circle cx="38" cy="63" r="1.7" fill="#7B74E0" opacity="0.72"/>
-              <circle cx="7"  cy="65" r="1.3" fill="#7B74E0" opacity="0.5"/>
-              <circle cx="43" cy="65" r="1.3" fill="#7B74E0" opacity="0.5"/>
-            </g>
-            <circle cx="25" cy="59" r="1.8" fill="#C4BFF0" opacity="0">
-              <animate attributeName="cy" from="59" to="9" dur="3.5s" repeatCount="indefinite" begin="0s"/>
-              <animate attributeName="r"  values="1.8;1.5;1.1;0.6" keyTimes="0;0.3;0.7;1" dur="3.5s" repeatCount="indefinite" begin="0s"/>
-              <animate attributeName="opacity" values="0;0.9;0.85;0" keyTimes="0;0.07;0.9;1" dur="3.5s" repeatCount="indefinite" begin="0s"/>
-            </circle>
-            <circle cx="25" cy="59" r="1.4" fill="#A9A3E8" opacity="0">
-              <animate attributeName="cy" from="59" to="9" dur="3.5s" repeatCount="indefinite" begin="1.17s"/>
-              <animate attributeName="r"  values="1.4;1.1;0.8;0.4" keyTimes="0;0.3;0.7;1" dur="3.5s" repeatCount="indefinite" begin="1.17s"/>
-              <animate attributeName="opacity" values="0;0.8;0.78;0" keyTimes="0;0.07;0.9;1" dur="3.5s" repeatCount="indefinite" begin="1.17s"/>
-            </circle>
-            <circle cx="25" cy="59" r="1.6" fill="#7B74E0" opacity="0">
-              <animate attributeName="cy" from="59" to="9" dur="3.5s" repeatCount="indefinite" begin="2.34s"/>
-              <animate attributeName="r"  values="1.6;1.3;0.9;0.5" keyTimes="0;0.3;0.7;1" dur="3.5s" repeatCount="indefinite" begin="2.34s"/>
-              <animate attributeName="opacity" values="0;0.85;0.82;0" keyTimes="0;0.07;0.9;1" dur="3.5s" repeatCount="indefinite" begin="2.34s"/>
-            </circle>
-          </svg>
+          ${yggSVG}
         </div>
         <div class="empty-quote-area">
           <div class="empty-quote-txt" id="eq-text">${QUOTES_PS[0].text}</div>
@@ -2094,20 +2390,19 @@ async function loadSessions() {
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Criar primeiro paciente
         </button>
-        <p class="empty-hint">Cada paciente terá seus testes, histórico e relatório de performance reunidos em um único lugar.</p>
+        <p class="empty-hint">Cada paciente terá seus testes, histórico e relatório de performance reunidos aqui.</p>
       </div>`;
     let _qi = 0;
     if (window._emptyQI) clearInterval(window._emptyQI);
     window._emptyQI = setInterval(() => {
-      const te = document.getElementById('eq-text');
-      const ae = document.getElementById('eq-auth');
+      const te = document.getElementById('eq-text'), ae = document.getElementById('eq-auth');
       if (!te) { clearInterval(window._emptyQI); return; }
-      te.style.opacity = '0'; ae.style.opacity = '0';
+      te.style.opacity='0'; ae.style.opacity='0';
       setTimeout(() => {
-        _qi = (_qi + 1) % QUOTES_PS.length;
+        _qi = (_qi+1) % QUOTES_PS.length;
         te.textContent = QUOTES_PS[_qi].text;
         ae.textContent = QUOTES_PS[_qi].author;
-        te.style.opacity = '1'; ae.style.opacity = '1';
+        te.style.opacity='1'; ae.style.opacity='1';
       }, 560);
     }, 8000);
     return;
@@ -2852,17 +3147,16 @@ document.getElementById('reportLogo').src = LOGO_B64;
 
 /* ── ABAS ─────────────────────────────────────────────────────── */
 function switchTab(tab) {
-  const scannerMain = document.getElementById('scannerMain');
-  const testsPanel  = document.getElementById('tests-panel');
-  document.getElementById('tab-relatorio').classList.toggle('active', tab === 'relatorio');
-  document.getElementById('tab-testes').classList.toggle('active',    tab === 'testes');
-  if (tab === 'relatorio') {
-    scannerMain.style.display = '';
-    testsPanel.classList.remove('active');
-  } else {
-    scannerMain.style.display = 'none';
-    testsPanel.classList.add('active');
-  }
+  const scannerMain      = document.getElementById('scannerMain');
+  const testsPanel       = document.getElementById('tests-panel');
+  const flashcardsPanel  = document.getElementById('flashcards-panel');
+  document.getElementById('tab-relatorio').classList.toggle('active',  tab === 'relatorio');
+  document.getElementById('tab-testes').classList.toggle('active',     tab === 'testes');
+  document.getElementById('tab-flashcards').classList.toggle('active', tab === 'flashcards');
+
+  scannerMain.style.display     = (tab === 'relatorio')  ? '' : 'none';
+  testsPanel.classList.toggle('active',      tab === 'testes');
+  flashcardsPanel.classList.toggle('active', tab === 'flashcards');
 }
 
 /* ── NAVEGAÇÃO DOS TESTES ─────────────────────────────────────── */
@@ -4921,6 +5215,316 @@ const WHOQOLModule = (() => {
 function openTestWHOQOL()    { WHOQOLModule.init(); showScreen('whoqol'); }
 function whoqolGoBack()      { WHOQOLModule._goBack(); returnFromTest('whoqol'); }
 function whoqolConfirmReset(){ if(confirm('Reiniciar WHOQOL-Bref?')) WHOQOLModule._retry(); }
+
+/* ══════════════════════════════════════════════════════════════
+   MÓDULO FLASHCARDS
+   ══════════════════════════════════════════════════════════════ */
+const FlashcardsModule = (() => {
+
+  const SPORT_CATS = {
+    reg:   {label:"Regulação Emocional",      color:"#6c8ef5", bg:"rgba(108,142,245,.18)"},
+    tcc:   {label:"TCC no Esporte",            color:"#a78bfa", bg:"rgba(167,139,250,.18)"},
+    attn:  {label:"Atenção e Concentração",    color:"#38bdf8", bg:"rgba(56,189,248,.18)"},
+    mem:   {label:"Memória e Aprendizagem",    color:"#fb923c", bg:"rgba(251,146,60,.18)"},
+    mot:   {label:"Motivação",                 color:"#f472b6", bg:"rgba(244,114,182,.18)"},
+    perc:  {label:"Percepção e Decisão",       color:"#4ade80", bg:"rgba(74,222,128,.18)"},
+    stress:{label:"Estresse e Coping",         color:"#fbbf24", bg:"rgba(251,191,36,.18)"},
+    self:  {label:"Autoeficácia e Confiança",  color:"#34d399", bg:"rgba(52,211,153,.18)"},
+  };
+
+  const SPORT_CARDS = [
+    {cat:"reg",q:"O que é o modelo de Processo de Regulação Emocional de Gross (1998)?",a:"Descreve 5 famílias de estratégias ordenadas temporalmente:\n<strong>seleção de situação → modificação → foco atencional → reavaliação cognitiva → supressão da resposta.</strong>\nNo esporte, reavaliação cognitiva é a estratégia mais adaptativa."},
+    {cat:"reg",q:"Qual a diferença entre regulação emocional antecedente e focada na resposta?",a:"<strong>Antecedente:</strong> atua antes da emoção se consolidar (reavaliação, seleção de situação).\n<strong>Focada na resposta:</strong> atua após a emoção surgir (supressão expressiva).\nSupressão consome recursos cognitivos e prejudica desempenho; reavaliação não."},
+    {cat:"reg",q:"O que é o modelo IZOF de Hanin?",a:"Cada atleta possui uma <strong>zona individual ideal de ativação</strong> (não universal) na qual performa melhor.\nEmoções funcionais e disfuncionais são idiossincrásicas — tanto positivas quanto negativas podem ser funcionais para um dado atleta."},
+    {cat:"reg",q:"Quais são as 4 dimensões emocionais do modelo Valence × Activation?",a:"<strong>Alta + Positiva:</strong> entusiasmo, confiança.\n<strong>Alta + Negativa:</strong> ansiedade, raiva.\n<strong>Baixa + Positiva:</strong> calma, relaxamento.\n<strong>Baixa + Negativa:</strong> tristeza, desânimo.\nCada quadrante tem perfis de intervenção distintos."},
+    {cat:"reg",q:"Descreva a técnica de reavaliação cognitiva aplicada ao esporte.",a:"Reinterpretar o significado de um estressor para alterar seu impacto emocional.\nEx: <strong>ansiedade pré-competição como 'ativação funcional'</strong> (anxiety reappraisal), não como ameaça.\nEvidência: reduz respostas fisiológicas de estresse e melhora desempenho sob pressão."},
+    {cat:"reg",q:"O que é Mindfulness-Acceptance e como difere da reavaliação cognitiva?",a:"<strong>Mindfulness-Acceptance:</strong> observar emoções sem mudar ou suprimir (base do ACT/MAC).\n<strong>Reavaliação:</strong> muda o conteúdo cognitivo da emoção.\nNo esporte, Mindfulness reduz evitação experiencial e melhora foco no presente."},
+    {cat:"reg",q:"Por que a supressão expressiva é contraproducente no alto rendimento?",a:"(1) Não reduz a experiência emocional interna.\n(2) Consome recursos de memória de trabalho.\n(3) Prejudica comunicação em esportes coletivos.\n(4) Associada a maior ruminação pós-evento.\n<strong>Intervenção:</strong> substituir por reavaliação ou aceitação."},
+    {cat:"reg",q:"O que é regulação intrapessoal vs. interpessoal no esporte?",a:"<strong>Intrapessoal:</strong> atleta regula seus próprios estados emocionais.\n<strong>Interpessoal:</strong> técnico, psicólogo ou companheiros influenciam o estado emocional do atleta.\nEquipes de alto rendimento utilizam as duas ativamente e de forma coordenada."},
+    {cat:"tcc",q:"Quais são os 3 componentes centrais do modelo TCC aplicado ao esporte?",a:"<strong>1. Cognições:</strong> pensamentos automáticos e crenças sobre desempenho.\n<strong>2. Emoções:</strong> respostas afetivas vinculadas às cognições.\n<strong>3. Comportamentos:</strong> padrões de conduta (evitação, rituais, automonitoramento).\nO ciclo cognitivo-emocional-comportamental mantém crenças desadaptativas."},
+    {cat:"tcc",q:"O que são pensamentos automáticos negativos (PANs) em atletas? Cite 3 exemplos.",a:"Cognições involuntárias, rápidas e relacionadas à performance:\n<strong>• 'Se eu errar, o técnico vai me tirar.'</strong>\n<strong>• 'Não sou bom o suficiente para esse nível.'</strong>\n<strong>• 'Meus adversários são melhores.'</strong>\nAumentam ansiedade cognitiva e reduzem autoconfiança."},
+    {cat:"tcc",q:"Descreva a Reestruturação Cognitiva em 4 passos aplicados ao esporte.",a:"<strong>1. Identificar</strong> o pensamento automático disfuncional.\n<strong>2. Examinar evidências</strong> a favor e contra.\n<strong>3. Gerar alternativas</strong> mais equilibradas e funcionais.\n<strong>4. Testar</strong> o novo pensamento em treino/competição.\nFerramenta-chave: Registro de Pensamentos."},
+    {cat:"tcc",q:"O que é self-talk e quais são suas 3 funções no esporte?",a:"Diálogo interno consciente do atleta. Funções:\n<strong>1. Motivacional:</strong> aumenta esforço e persistência.\n<strong>2. Instrucional:</strong> direciona atenção técnica.\n<strong>3. Regulação do arousal:</strong> controla nível de ativação.\nSelf-talk positivo tem evidência robusta para melhora de performance."},
+    {cat:"tcc",q:"O que é o modelo ABC de Ellis (TREC) e como aplicá-lo com atletas?",a:"<strong>A (Activating event):</strong> situação desencadeante.\n<strong>B (Beliefs):</strong> crenças irracionais sobre o evento.\n<strong>C (Consequences):</strong> emoções e comportamentos resultantes.\n<strong>D (Dispute):</strong> disputar as crenças para gerar novo efeito emocional (E)."},
+    {cat:"tcc",q:"Quais são as crenças irracionais mais frequentes em atletas segundo a TREC?",a:"<strong>1. Exigência absoluta:</strong> 'Eu DEVO ganhar sempre.'\n<strong>2. Catastrofização:</strong> 'Perder seria o fim de tudo.'\n<strong>3. Baixa tolerância à frustração:</strong> 'Não suporto cometer erros.'\n<strong>4. Depreciação do self:</strong> 'Sou sem valor se não vencer.'"},
+    {cat:"tcc",q:"O que é a ACT e como difere da TCC clássica no esporte?",a:"<strong>TCC clássica:</strong> modifica o conteúdo dos pensamentos disfuncionais.\n<strong>ACT:</strong> muda a relação funcional com os pensamentos — desfusão cognitiva, aceitação e ação baseada em valores.\nReduz evitação experiencial e aumenta comprometimento com objetivos."},
+    {cat:"tcc",q:"O que é o protocolo MAC e para quem é indicado?",a:"Protocolo de Gardner & Moore (2007) adaptado do ACT para atletas. Fases:\n<strong>1.</strong> Psicoeducação sobre mindfulness.\n<strong>2.</strong> Aceitação de pensamentos/emoções.\n<strong>3.</strong> Comprometimento com valores esportivos.\n<strong>4.</strong> Exposição a situações de pressão.\nIndicado para atletas com alta fusão cognitiva ou perfeccionismo desadaptativo."},
+    {cat:"tcc",q:"Cite 4 distorções cognitivas comuns em atletas.",a:"<strong>1. Catastrofização:</strong> amplificar o pior cenário.\n<strong>2. Leitura mental:</strong> 'Sei que o técnico acha que fui mal.'\n<strong>3. Filtragem:</strong> focar apenas nos erros, ignorar acertos.\n<strong>4. Personalização:</strong> culpar-se por eventos fora do controle."},
+    {cat:"tcc",q:"Como conduzir uma intervenção de Imagery dentro da TCC esportiva?",a:"<strong>1.</strong> Identificar situações-problema cognitivo-emocionais.\n<strong>2.</strong> Construir cena de manejo eficaz (não resultado perfeito).\n<strong>3.</strong> Praticar em estado de relaxamento com todos os sentidos ativados.\n<strong>4.</strong> Incluir variantes de adversidade para ensaiar regulação emocional.\nEvidência: reduz ansiedade e aumenta autoeficácia."},
+    {cat:"tcc",q:"Qual a diferença entre perfeccionismo adaptativo e desadaptativo em atletas?",a:"<strong>Adaptativo:</strong> altos padrões + flexibilidade cognitiva → motivação intrínseca e resiliência.\n<strong>Desadaptativo:</strong> altos padrões + medo de falhar → ansiedade, burnout e evitação.\n<strong>TCC:</strong> desafiar crenças de autoexigência absoluta e desenvolver autocompaixão."},
+    {cat:"tcc",q:"O que é o modelo de Controle de Processos Duplos no esporte?",a:"Memória de trabalho tem capacidade limitada. Estratégias que consomem recursos executivos (ex: supressão) <strong>prejudicam decisão e coordenação técnica</strong> simultâneas.\nImplicação: treinar estratégias de baixo custo cognitivo como reavaliação e aceitação."},
+    {cat:"attn",q:"O que é o modelo de Foco Atencional de Nideffer (1976) e suas 4 dimensões?",a:"Dimensões de <strong>amplitude</strong> (amplo/estreito) × <strong>direção</strong> (interno/externo):\n• Amplo-externo: leitura do ambiente.\n• Amplo-interno: análise de plano tático.\n• Estreito-externo: foco num alvo específico.\n• Estreito-interno: foco em sensações corporais."},
+    {cat:"attn",q:"O que é 'choking under pressure' e qual seu mecanismo cognitivo?",a:"Queda de desempenho sob alta pressão apesar de competência estabelecida.\n<strong>Mecanismo:</strong> aumento de automonitoramento consciente interrompe processos automáticos (reinvestimento).\n<strong>Intervenção:</strong> tarefas duplas de distração, rotinas pré-performance, foco externo de atenção."},
+    {cat:"attn",q:"Por que o foco externo supera o interno durante habilidades motoras automatizadas?",a:"Hipótese de Constrained Action (Wulf): foco externo libera o sistema motor de interferência consciente, permitindo maior automaticidade.\nEx: 'bola no alvo' (externo) → melhor acuidade que 'mova o pulso' (interno)."},
+    {cat:"attn",q:"O que são rotinas pré-performance e qual seu papel na regulação atencional?",a:"Sequências de pensamentos e ações antes de execução técnica. Funções:\n<strong>1.</strong> Estreitar o foco atencional relevante.\n<strong>2.</strong> Bloquear distrações internas e externas.\n<strong>3.</strong> Criar gatilho de estado psicofisiológico ótimo."},
+    {cat:"attn",q:"O que é a técnica de 'keyword' e como usá-la com atletas?",a:"Uma palavra-gatilho (ex: 'sólido', 'presente') que ancora o foco atencional desejado.\nUso: associar a keyword ao estado de performance ótima durante treino → ativação automática em competição.\n<strong>TCC:</strong> combinar com self-talk instrucional e rotinas pré-performance."},
+    {cat:"attn",q:"O que é mindfulness aplicado à atenção no esporte e como difere da concentração tradicional?",a:"<strong>Concentração tradicional:</strong> esforço de supressão de distratores.\n<strong>Mindfulness:</strong> observar distrações sem reatividade, retornar intencionalmente ao foco.\nVantagem: menor custo cognitivo e maior resiliência atencional sob fadiga."},
+    {cat:"mem",q:"O que é a teoria OPTIMAL de aprendizagem motora (Wulf & Lewthwaite, 2016)?",a:"Optimized Performance Through Intrinsic Motivation And Attention Leading to more Learning.\nPilares: <strong>autonomia + expectativas positivas + foco externo de atenção.</strong>\nImplicação: feedback que preserva autonomia e promove confiança acelera aprendizagem motora."},
+    {cat:"mem",q:"Qual a diferença entre prática bloqueada e aleatória e quando usar cada uma?",a:"<strong>Bloqueada:</strong> repetição contínua do mesmo movimento → rápida aquisição inicial.\n<strong>Aleatória:</strong> variação de habilidades → retenção e transferência superiores (efeito de interferência contextual).\n<strong>Uso:</strong> iniciantes → bloqueada; avançados → aleatória."},
+    {cat:"mem",q:"O que é o efeito de prática distribuída vs. massed e como aplicar no esporte?",a:"<strong>Massed (concentrada):</strong> longas sessões sem intervalo → fadiga, consolidação inferior.\n<strong>Distribuída:</strong> sessões menores com intervalos → consolidação de memória superior.\n<strong>Aplicação:</strong> periodizar mini-blocos técnicos ao longo da semana."},
+    {cat:"mem",q:"Como a capacidade limitada da memória de trabalho afeta o aprendizado técnico?",a:"Capacidade de ~4 chunks. Limitações:\n<strong>1.</strong> Instruções excessivas sobrecarregam e bloqueiam automatização.\n<strong>2.</strong> Estresse reduz ainda mais a capacidade disponível.\n<strong>Intervenção:</strong> simplificar instrução, usar analogias e progressão por chunks."},
+    {cat:"mem",q:"O que é a técnica de 'analogia' no ensino motor e por que é eficaz?",a:"Substituir instruções técnicas explícitas por uma metáfora biomecânica.\nVantagem: <strong>encapsula regras complexas em um único chunk</strong>, preservando recursos de memória de trabalho.\nEvidência: reduz reinvestimento e melhora performance sob pressão."},
+    {cat:"mot",q:"Quais são os 3 componentes básicos da SDT de Ryan & Deci?",a:"<strong>1. Autonomia:</strong> sentido de volição e origem interna do comportamento.\n<strong>2. Competência:</strong> sentir-se eficaz e capaz de dominar tarefas.\n<strong>3. Relacionamento:</strong> sentir-se conectado e apoiado socialmente."},
+    {cat:"mot",q:"O que é o continuum motivacional da SDT?",a:"Da <strong>amotivação</strong> à <strong>motivação intrínseca</strong>, passando por 4 formas de regulação extrínseca:\namotivação → regulação externa → introjeção → identificação → integração → motivação intrínseca."},
+    {cat:"mot",q:"O que é a Teoria das Metas de Realização (AGT) e seus dois climas motivacionais?",a:"<strong>Clima de maestria (task):</strong> sucesso = aprendizado e melhora pessoal → motivação intrínseca.\n<strong>Clima de performance (ego):</strong> sucesso = superioridade sobre outros → motivação extrínseca frágil."},
+    {cat:"mot",q:"Quais são os 3 componentes do burnout em atletas segundo Raedeke (1997)?",a:"<strong>1. Exaustão emocional e física:</strong> esgotamento após demanda crônica.\n<strong>2. Despersonalização/cinismo:</strong> distanciamento emocional do esporte.\n<strong>3. Redução do senso de realização:</strong> sentir que conquistas não têm valor."},
+    {cat:"mot",q:"O que é orientação de processo vs. resultado e como promover a de processo?",a:"<strong>Resultado:</strong> foco em vencer — vulnerável a variáveis incontroláveis.\n<strong>Processo:</strong> foco em execução técnica — mais controlável e sustentável.\n<strong>Intervenção:</strong> metas de processo, revisão por análise de processo, não apenas placar."},
+    {cat:"mot",q:"O que é a Teoria do Fluxo de Csikszentmihalyi e suas condições no esporte?",a:"Estado de imersão total e prazer intrínseco ('flow'). Condições:\n<strong>1.</strong> Desafio equilibrado com habilidade.\n<strong>2.</strong> Metas claras e feedback imediato.\n<strong>3.</strong> Foco total sem automonitoramento excessivo."},
+    {cat:"perc",q:"O que é reconhecimento de padrões e como treiná-lo em atletas de alto rendimento?",a:"Capacidade de detectar configurações táticas relevantes rapidamente via memória de longo prazo.\nExpertos têm <strong>chunks táticos</strong> que permitem leitura de jogo mais veloz.\n<strong>Intervenção:</strong> vídeo-análise com pausa para antecipação."},
+    {cat:"perc",q:"O que é o modelo de Naturalistic Decision Making (NDM) de Klein no esporte?",a:"Em condições de pressão e incerteza, especialistas decidem por <strong>reconhecimento de padrões + simulação mental rápida</strong>, não por análise de alternativas.\nIntervenção: enriquecer acervo de padrões via simulação de cenários e debriefing estruturado."},
+    {cat:"perc",q:"O que é antecipação perceptual e como ela distingue experts de novatos?",a:"Capacidade de predizer eventos futuros antes que se completem com base em pistas iniciais.\nExpertos usam <strong>pistas cinestésicas precoces</strong> (posição do tronco, quadril) em vez de esperar pistas tardias."},
+    {cat:"perc",q:"O que é carga cognitiva e como impacta a tomada de decisão em competição?",a:"Demanda sobre os recursos limitados da memória de trabalho. Alta carga:\n<strong>1.</strong> Reduz qualidade decisional → escolhas mais impulsivas.\n<strong>2.</strong> Aumenta tempo de reação.\n<strong>3.</strong> Aumenta erros técnicos sob estresse."},
+    {cat:"perc",q:"O que é o viés de confirmação em atletas e como intervir?",a:"Tendência a buscar e lembrar informações que confirmam expectativas prévias.\nImpactos: aumenta ruminação, distorce avaliação de performance.\n<strong>Intervenção TCC:</strong> registro de evidências balanceadas e debriefing pós-competição."},
+    {cat:"stress",q:"Qual a diferença entre eustresse e distresse no contexto esportivo?",a:"<strong>Eustresse:</strong> ativação percebida como positiva e funcional.\n<strong>Distresse:</strong> ativação percebida como ameaça, gera disfunção.\nMesma fisiologia — <strong>a appraisal cognitiva</strong> é o fator determinante."},
+    {cat:"stress",q:"O que é o modelo transacional de estresse de Lazarus & Folkman?",a:"Estresse é resultado de uma transação pessoa-ambiente. Avaliações:\n<strong>Primária:</strong> 'Isso importa? É ameaça, desafio ou irrelevante?'\n<strong>Secundária:</strong> 'Tenho recursos para lidar?'"},
+    {cat:"stress",q:"Quais são os 4 estilos de coping de Lazarus e exemplos no esporte?",a:"<strong>1. Focado no problema:</strong> plano tático, treino adicional.\n<strong>2. Focado na emoção:</strong> relaxamento, reavaliação cognitiva.\n<strong>3. Aproximação:</strong> enfrentar ativamente o estressor.\n<strong>4. Evitação:</strong> distração estratégica (funcional a curto prazo)."},
+    {cat:"stress",q:"O que é a Catastrophe Theory de Hardy e quando se aplica?",a:"Para atletas com alta ansiedade cognitiva, o aumento de ativação fisiológica produz uma <strong>queda abrupta ('catástrofe')</strong> de desempenho além de um ponto crítico — não uma curva suave (U-invertido)."},
+    {cat:"stress",q:"O que é o Relaxamento Progressivo de Jacobson e como aplicar com atletas?",a:"Contração e relaxamento progressivo de grupos musculares para reduzir tensão somática.\n<strong>Protocolo clínico:</strong> 16 grupos musculares → 4 grupos → relaxamento diferencial no movimento.\n<strong>No esporte:</strong> versões abreviadas pré-competição (5-10 min) com palavra-gatilho de ancoragem."},
+    {cat:"stress",q:"O que é Biofeedback e como é usado na regulação de estresse em atletas?",a:"Técnica de feedback em tempo real de parâmetros fisiológicos (HRV, GSR, EMG, temperatura).\nUso no esporte:\n<strong>1.</strong> Aumentar consciência de ativação fisiológica.\n<strong>2.</strong> Treinar autorregulação (ex: HRV biofeedback para coerência cardíaca).\n<strong>3.</strong> Avaliar eficácia de intervenções de relaxamento."},
+    {cat:"self",q:"Quais são as 4 fontes de autoeficácia de Bandura e como potencializá-las no esporte?",a:"<strong>1. Experiências de domínio:</strong> sucessos passados — criar desafios graduados.\n<strong>2. Experiências vicárias:</strong> observar pares — modelos de coping similares.\n<strong>3. Persuasão verbal:</strong> feedback positivo e específico.\n<strong>4. Estados fisiológicos:</strong> interpretar ativação como energia, não ameaça."},
+    {cat:"self",q:"O que é confiança esportiva segundo Vealey (2001) e como difere de autoeficácia?",a:"<strong>Autoeficácia (Bandura):</strong> crença na capacidade de executar comportamento específico — situacional.\n<strong>Confiança esportiva (Vealey):</strong> construto mais amplo (traço + estado) sobre habilidade esportiva geral."},
+    {cat:"self",q:"O que é o ciclo de autoeficácia e como ele pode ser positivo ou negativo?",a:"<strong>Ciclo positivo:</strong> Alta autoeficácia → mais esforço → melhor desempenho → confirma eficácia.\n<strong>Ciclo negativo:</strong> Baixa autoeficácia → evitação → pior desempenho → confirma baixa eficácia."},
+    {cat:"self",q:"O que é o modelo de 'Humble Confidence' no esporte?",a:"<strong>Superconfiança:</strong> subestimação do oponente, redução de preparação, rigidez tática.\n<strong>Humble Confidence:</strong> alta autoeficácia + humildade epistêmica — abertura a ajustes e feedback."},
+    {cat:"self",q:"Como a linguagem do técnico afeta a autoeficácia do atleta?",a:"<strong>1. Feedback específico ao processo</strong> supera elogios genéricos.\n<strong>2. Evitar comparações sociais negativas</strong> — minam competência percebida.\n<strong>3. Atribuições controláveis:</strong> vincular resultado a esforço/estratégia.\n<strong>4. Mensagens de coping:</strong> 'Sei que será difícil, e sei que você consegue lidar.'"},
+    {cat:"self",q:"O que é a técnica de self-modeling e como implementá-la para construir confiança?",a:"Exibição ao atleta de <strong>versões editadas de suas próprias melhores performances</strong>.\n<strong>Feedforward:</strong> composição de execuções técnicas ótimas ainda não dominadas → antecipa sucesso.\n<strong>Positive review:</strong> reforça memória de competência e contra-arresta viés de negatividade."},
+  ];
+
+  const PSIC_CATS = {
+    estrutural:{label:"Conceitos Estruturais",  color:"#c084fc", bg:"rgba(192,132,252,.18)"},
+    sintoma:   {label:"Clínica do Sintoma",     color:"#f472b6", bg:"rgba(244,114,182,.18)"},
+    angustia:  {label:"Clínica da Angústia",    color:"#fb923c", bg:"rgba(251,146,60,.18)"},
+    transfer:  {label:"Transferência e Manejo", color:"#38bdf8", bg:"rgba(56,189,248,.18)"},
+    fim:       {label:"Fim de Análise",         color:"#34d399", bg:"rgba(52,211,153,.18)"},
+    outras:    {label:"Outras Escolas",         color:"#fbbf24", bg:"rgba(251,191,36,.18)"},
+  };
+
+  const PSIC_CARDS = [
+    {cat:"estrutural",q:"O que é o sujeito para Lacan e por que ele é sempre 'barrado' ($)?",concept:"Para Lacan, o <strong>sujeito ($)</strong> não é o eu consciente, mas o sujeito do inconsciente, sempre dividido entre o que fala e o que não sabe que fala. A barra indica uma divisão constitutiva: ao entrar na linguagem, o sujeito perde o acesso direto ao ser e passa a ser representado por significantes. <strong>O sujeito é efeito da linguagem, não sua origem.</strong>",apply:"Na clínica, o objetivo não é 'fortalecer o ego' mas dar espaço para que o sujeito barrado se manifeste — nas hesitações, lapsos, repetições e sonhos. O analista escuta o que escapa ao discurso consciente do paciente.",example:"💡 <strong>Exemplo:</strong> Paciente que diz 'Eu sempre ajo racionalmente' — mas sistematicamente sabota seus próprios planos. O sujeito barrado aparece no que escapa ao discurso consciente: há um gozo na autossabotagem que o 'eu racional' não reconhece."},
+    {cat:"estrutural",q:"O que é o grande Outro (A) em Lacan e qual seu papel na estruturação psíquica?",concept:"O <strong>grande Outro (A)</strong> é o lugar da linguagem, da lei simbólica e do código que antecede o sujeito. Não é uma pessoa, mas o campo simbólico que determina as posições e significações disponíveis. A falta no Outro (A barrado) é o que produz o desejo, já que nenhum Outro é completo ou garantidor absoluto.",apply:"Na clínica, escutar de qual Outro o paciente está falando — quem ocupa esse lugar para ele (pai, instituição, Deus, sociedade). A análise visa levar o sujeito a sustentar a falta no Outro sem colapsar em angústia ou fixar um substituto rígido.",example:"🏅 <strong>Exemplo:</strong> Paciente que performa apenas quando a figura de referência está presente — esse sujeito ocupa o lugar do grande Outro que garante o valor da performance. O trabalho é desvincular o valor do olhar do Outro."},
+    {cat:"estrutural",q:"O que é o objeto a (objeto pequeno a) em Lacan?",concept:"O <strong>objeto a</strong> é o objeto-causa do desejo: não o que o sujeito quer obter, mas o que causa o movimento do desejo. Não é um objeto real, mas um resto irredutível que escapa à simbolização. Lacan o articula ao conceito de gozo: é o que o sujeito crê poder reencontrar para completar sua falta constitutiva, mas que, quando 'obtido', sempre decepciona.",apply:"Na clínica, identificar o objeto a do sujeito é chave: o que funciona como causa do desejo para esse paciente? O que ele persegue repetidamente sem jamais se satisfazer? Trabalhar o fantasma fundamental ($◇a) é central na direção do tratamento lacaniano.",example:"💡 <strong>Exemplo:</strong> Paciente que não busca o objetivo em si — busca a sensação de que 'a próxima conquista pode ser aquela'. O objeto a é a promessa de completude. Compreender isso clinicamente separa compulsão de desejo genuíno."},
+    {cat:"estrutural",q:"O que é o gozo (jouissance) em Lacan e como se distingue do prazer?",concept:"<strong>Gozo (jouissance)</strong> não é prazer — é uma satisfação paradoxal que inclui sofrimento, repetição compulsiva e excesso. O princípio do prazer busca reduzir a tensão; o gozo vai além: é a satisfação que o sujeito retira do próprio sofrimento, da repetição, do sintoma.",apply:"Na clínica, não basta identificar o sofrimento — é preciso mapear o gozo implicado. 'O que você ganha ao continuar sofrendo dessa forma?' não é uma provocação, mas uma pergunta clínica real. A análise visa uma redistribuição do gozo — não sua eliminação.",example:"🏅 <strong>Exemplo:</strong> Paciente que continua uma situação dolorosa e recusa mudança. Há um gozo na martirização — a dor confirma sua identidade de 'dedicado e incompreendido'. O sintoma é ao mesmo tempo sofrimento e satisfação."},
+    {cat:"estrutural",q:"O que são as três ordens — Real, Simbólico e Imaginário (RSI) — em Lacan?",concept:"<strong>Imaginário (I):</strong> registro das imagens, identificações, rivalidade e relações especulares. <strong>Simbólico (S):</strong> campo da linguagem, da lei, do Nome-do-Pai — onde o sujeito é constituído. <strong>Real (R):</strong> o que escapa à simbolização e à imagem — o trauma, o gozo bruto. Os três são amarrados pelo nó borromeano.",apply:"Na clínica, distinguir em qual registro predomina o sofrimento orienta a intervenção. Sofrimento imaginário → trabalho com identificações. Sofrimento simbólico → trabalho no campo significante. Sofrimento no real → construção de bordas simbólicas.",example:"💡 <strong>Exemplo:</strong> Imaginário: 'Aquela pessoa me humilhou — preciso superá-la.' Simbólico: 'Meu pai dizia que isso é coisa de perdedor.' Real: a angústia bruta sem causa identificável. Cada registro pede intervenção diferente."},
+    {cat:"estrutural",q:"O que é o Nome-do-Pai em Lacan e o que ocorre quando ele falha (foraclusão)?",concept:"O <strong>Nome-do-Pai (NP)</strong> é o significante que representa a função paterna — a lei simbólica que organiza o desejo. A <strong>foraclusão (Verwerfung)</strong> — rejeição do Nome-do-Pai — é o mecanismo específico da psicose: o significante não é recalcado, mas foracluído, retornando no Real como alucinação ou delírio.",apply:"Na clínica, o diagnóstico estrutural (neurose, psicose, perversão) orienta a direção do tratamento. Na psicose: não tentar instalar o que foi foracluído — mas ajudar o sujeito a construir suplências. A estrutura não é mutável, mas o sujeito pode se virar de forma mais ou menos estabilizada.",example:"🏅 <strong>Exemplo:</strong> Paciente que desmorona completamente quando figuras de autoridade contradizem suas convicções — sem capacidade de relativizar. Pode indicar fragilidade na inscrição do Nome-do-Pai como mediador simbólico."},
+    {cat:"estrutural",q:"O que é o fantasma fundamental ($◇a) em Lacan e qual seu papel na clínica?",concept:"O <strong>fantasma fundamental</strong> — matema $◇a — é a fórmula que expressa a relação do sujeito barrado com o objeto-causa do desejo. É uma cena inconsciente que organiza a realidade do sujeito e confere um enquadre de gozo estável. A análise visa a <strong>travessia do fantasma</strong>: o sujeito reconhece e se desprende do enquadramento que o fixava.",apply:"Na clínica, o trabalho de longo prazo visa identificar a cena fantasmática — 'de qual posição o paciente goza repetidamente?' A travessia não é a destruição do fantasma, mas a destituição de sua condição de verdade absoluta.",example:"💡 <strong>Exemplo:</strong> Paciente que sempre 'sabota' conquistas iminentes — inconscientemente não tolera vencer. O fantasma organiza a cena: 'sou aquele que perde no final'. A travessia passa por elaborar de onde vem esse lugar de perdedor como identidade gozada."},
+    {cat:"sintoma",q:"O que é o sintoma para Lacan e como ele difere do sintoma médico?",concept:"Para Lacan, o <strong>sintoma</strong> não é disfunção a eliminar — é uma <strong>formação do inconsciente com estrutura de linguagem</strong>, portador de sentido cifrado. Há gozo implicado no sintoma — ele satisfaz ao mesmo tempo que faz sofrer. O <strong>sinthome</strong> (versão tardia) é uma amarração que sustenta o sujeito e não deve necessariamente ser dissolvido.",apply:"Na clínica, o sintoma não é o inimigo — é o ponto de entrada. Escutar o que o sintoma diz, não apenas o que o paciente diz sobre o sintoma. Questionar o benefício secundário (ganho de gozo) é necessário antes de qualquer intervenção modificadora.",example:"🏅 <strong>Exemplo:</strong> Paciente com dor crônica sem causa orgânica detectável. O sintoma somático pode ser a única forma que o sujeito encontrou para fazer pausa legítima e receber cuidado. Eliminar o sintoma sem trabalhar o que ele cifra produz deslocamento — aparece outro sintoma."},
+    {cat:"sintoma",q:"O que são as formações do inconsciente e como Lacan as articula à linguagem?",concept:"O inconsciente é estruturado como uma linguagem. As <strong>formações do inconsciente</strong> — sonhos, lapsos, chistes e sintomas — obedecem a: <strong>metáfora</strong> (condensação — substitui um significante por outro) e <strong>metonímia</strong> (deslocamento — o desejo desliza de objeto em objeto). O inconsciente tem lógica, e o analista aprende a lê-la.",apply:"Na clínica, escutar com atenção flutuante significa estar atento ao que desliza na fala: os tropeços, as repetições de palavras, os temas que retornam sem que o paciente note.",example:"💡 <strong>Exemplo:</strong> Paciente que usa repetidamente a palavra 'matar' ao falar de conquistas. O deslizamento metafórico pode revelar uma posição agressiva que vai além do sentido literal. Escutar o significante, não apenas o sentido consciente."},
+    {cat:"sintoma",q:"O que é inibição para Lacan e Freud e como se diferencia do sintoma?",concept:"Freud distinguiu em 'Inibição, Sintoma e Angústia' (1926): <strong>Inibição</strong> é uma limitação funcional do ego — sem sentido cifrado, há evitação. <strong>Sintoma</strong> tem sentido, é formação de compromisso com o inconsciente. Lacan refinou: inibição está do lado do imaginário; sintoma, do simbólico.",apply:"Na clínica, distinguir se o paciente tem inibição ou sintoma orienta a intervenção. A inibição pede menos interpretação e mais construção de condições para que a função se restabeleça. O sintoma pede deciframento do sentido encoberto.",example:"🏅 <strong>Exemplo:</strong> Paciente que para de funcionar em certa área sem conseguir explicar por quê — sem conflito aparente, sem narrativa. Isso é mais próximo da inibição: uma paralisação imaginária. Trabalhar a imagem pode ser mais fecundo do que buscar sentido oculto."},
+    {cat:"sintoma",q:"O que é o recalque (Verdrängung) em Freud e como Lacan o reelabora?",concept:"O <strong>recalque</strong> em Freud é o mecanismo central da neurose: um representante pulsional inaceitável ao ego é expulso da consciência mas continua ativo no inconsciente, retornando sob formas deformadas. Lacan reescreve: o recalque é o fracasso do significante — o significante recalcado retorna sob outra forma, produzindo o sintoma como metáfora.",apply:"Na clínica, o objetivo não é trazer o recalcado à consciência de forma bruta — mas criar condições para que o sujeito possa sustentar o que anteriormente era insuportável. A interpretação precisa ser calibrada: interpretação precoce pode intensificar as defesas.",example:"💡 <strong>Exemplo:</strong> Paciente que 'não consegue' realizar certa ação em situações objetivamente corretas — travar pode ser recalque de algo associado a um interdito familiar. A intervenção passa por elaborar o que aquele ato significa para esse sujeito."},
+    {cat:"sintoma",q:"O que é o sinthome (com 'h') no último Lacan e por que ele importa clinicamente?",concept:"No Seminário XXIII (1975-76), Lacan introduz o <strong>sinthome</strong> — uma amarração singular dos três registros RSI que sustenta o sujeito — uma solução de existência que não precisa ser desfeita. O exemplo paradigmático é James Joyce: sua escrita era o sinthome que amarrava o que a metáfora paterna não havia amarrado.",apply:"Clinicamente, a noção de sinthome impede que o analista trate todo sintoma como algo a eliminar. Em alguns sujeitos, o sinthome é o que os mantém de pé. A direção do tratamento pode ser sustentar, refinar e tornar o sinthome mais habitável, não dissolvê-lo.",example:"🏅 <strong>Exemplo:</strong> Paciente que organiza toda sua vida em torno de uma atividade de forma que parece obsessiva — mas é exatamente esse regime que o mantém estável. Trabalhar para 'equilibrar' pode ser nefasto se essa atividade funciona como sinthome."},
+    {cat:"angustia",q:"O que é a angústia para Lacan e por que ela é o único afeto que não engana?",concept:"Para Lacan (Seminário X), a angústia é o <strong>único afeto que não engana</strong> — não é sem objeto, mas tem um objeto: o objeto a. A angústia surge quando o objeto a aparece de forma demasiado próxima — quando o que deveria permanecer ausente se torna presente demais. É o sinal do real.",apply:"Na clínica, a angústia do paciente é um dado precioso — indica que algo do real está em jogo. O analista deve sustentar a angústia sem apressá-la nem fugi-la. Interpretações precoces que visam 'aliviar' a angústia podem suturá-la antes que o sujeito elabore o que ela sinaliza.",example:"💡 <strong>Exemplo:</strong> Paciente que, às vésperas de grande conquista, entra em angústia intensa — não medo de falhar, mas sensação de estranheza. Pode ser o real do desejo se aproximando: 'e se eu conseguir?' — o êxito como objeto a demasiado próximo."},
+    {cat:"angustia",q:"Como Freud conceitua a angústia em 'Inibição, Sintoma e Angústia' (1926)?",concept:"Em 1915 (primeira teoria), Freud entendia a angústia como resultado da libido represada. Em <strong>1926 (segunda teoria)</strong>, Freud inverte: a angústia é o <strong>sinal</strong> que o ego produz diante de uma situação de perigo. A angústia mobiliza o recalque, não resulta dele. Situações de perigo prototípicas: perda do objeto, perda do amor do objeto, castração, punição do superego.",apply:"Na clínica, escutar qual 'situação de perigo' específica é sinalizada pela angústia do paciente. Usar a angústia como bússola: ela aponta para o que o sujeito mais teme perder — e isso é central na direção do tratamento.",example:"🏅 <strong>Exemplo:</strong> Paciente que apresenta angústia intensa especificamente antes de situações onde poderia superar o pai em conquistas. A angústia sinaliza o perigo simbólico de 'matar o pai' — ultrapassar o limite identificatório."},
+    {cat:"angustia",q:"O que é a angústia de castração em Lacan e como ela se articula ao desejo?",concept:"A <strong>angústia de castração</strong> não é medo da mutilação anatômica — é a ameaça simbólica de perda do falo como significante do desejo. A castração impõe a falta e inaugura o desejo: só deseja quem falta. Resistir à castração é resistir ao próprio desejo.",apply:"Na clínica, quando um paciente evita sistematicamente comprometer-se — em relacionamentos, metas, projetos — pode estar evitando a castração que o compromisso exige: escolher um caminho é castrar os outros. O trabalho é ajudar o sujeito a suportar a falta que a escolha implica.",example:"💡 <strong>Exemplo:</strong> Paciente que nunca se compromete emocionalmente em nenhuma relação — mantém sempre uma saída. Clinicamente, pode ser evitação da castração que um compromisso real exigiria. 'Escolher' implica castrar outras possibilidades — e isso angustia."},
+    {cat:"angustia",q:"O que é o acting out e a passagem ao ato em Lacan, e como se distinguem?",concept:"<strong>Acting out:</strong> ação endereçada ao Outro — é uma mensagem encenada, um apelo que pede interpretação. O sujeito ainda está no campo do Outro. <strong>Passagem ao ato:</strong> o sujeito se identifica com o objeto a e cai fora da cena — é uma saída do campo simbólico. O gesto suicida como passagem ao ato é o exemplo extremo.",apply:"Na clínica, distinguir acting out de passagem ao ato é clinicamente urgente. Acting out — escutar o que a ação diz, não apenas contê-la. Passagem ao ato — intervir no real primeiro, garantir segurança. Em supervisão, essa distinção deve ser trabalhada com cuidado.",example:"🏅 <strong>Exemplo:</strong> Paciente que, após uma ruptura, faz algo dramático e o comunica ao outro diretamente. É acting out — mensagem encenada endereçada ao Outro que excluiu. Pede escuta do que essa cena diz sobre pertencimento."},
+    {cat:"angustia",q:"O que é a angústia de separação em Freud e como ela se manifesta clinicamente?",concept:"A <strong>angústia de separação</strong> é uma das situações de perigo prototípicas de Freud (1926) — o medo da perda do objeto amado. Lacan articula: a separação é constitutiva — instala a falta que produz o desejo. A angústia de separação é reativada sempre que o sujeito arrisca perder um objeto que funciona como âncora identificatória.",apply:"Na clínica, aparece em momentos de transição: fim de ciclos, mudanças de vida, término de análise. O trabalho é ajudar o sujeito a elaborar a perda sem precisar negar a falta ou substituir compulsivamente o objeto perdido.",example:"💡 <strong>Exemplo:</strong> Paciente em final de uma fase importante que adia indefinidamente a transição — não por incapacidade objetiva, mas por incapacidade de se separar da identidade que essa fase conferia. 'Sem isso, quem sou eu?'"},
+    {cat:"angustia",q:"O que é o fenômeno de 'estranheza' (Unheimliche) em Freud e como se articula ao real lacaniano?",concept:"O <strong>Unheimliche</strong> — 'estranho-familiar' — é o afeto que surge quando algo familiar se torna repentinamente estranho, ou algo estranho revela ser familiar. É o retorno do recalcado numa forma não reconhecida. Lacan articula ao real: é um dos modos de encontro com o real — quando o véu do simbólico/imaginário se rasga momentaneamente.",apply:"Na clínica, estados de Unheimliche são momentos clinicamente ricos — o sujeito teve contato com algo do real. Não apressar a simbolização. Trabalhar com o que foi sentido antes de tentar nomeá-lo.",example:"🏅 <strong>Exemplo:</strong> Paciente que, em determinado momento significativo, se vê 'de fora' — observando a si mesmo sem reconhecer quem está ali. Estado de estranheza-familiar clássico. Pode ser dissociação defensiva ou contato com algo do real que ainda não tem palavras."},
+    {cat:"transfer",q:"O que é a transferência para Lacan e como ela difere da visão freudiana clássica?",concept:"Freud concebeu a transferência como reedição de relações objetais passadas. <strong>Lacan reelabora:</strong> a transferência é o <strong>amor ao suposto saber (sujet supposé savoir)</strong> — o paciente supõe que o analista sabe o sentido de seus sintomas. Esse endereçamento abre o espaço da análise. O analista não deve encarnar o saber suposto, mas sustentar a posição sem preenchê-la.",apply:"Na clínica, o manejo da transferência lacaniano implica não responder ao amor transferencial como pessoa, mas sustentá-lo como endereçamento ao saber inconsciente do próprio paciente. O analista é suporte, não destinatário final.",example:"💡 <strong>Exemplo:</strong> Paciente que idealiza o terapeuta como detentor de todas as respostas — 'ele vai me dizer exatamente o que fazer'. O analista sustenta a posição sem encarnar a onisciência — devolve perguntas em vez de fornecer certezas."},
+    {cat:"transfer",q:"O que é contratransferência e qual sua posição na clínica lacaniana vs. relacional?",concept:"Para Freud, contratransferência eram os sentimentos do analista — inicialmente vista como obstáculo. A escola <strong>kleiniana/relacional</strong> reabilitou como instrumento clínico valioso: os sentimentos do analista informam sobre o estado interno do paciente (identificação projetiva). <strong>Lacan</strong> foi crítico: usar a contratransferência como guia técnico coloca a subjetividade do analista no centro.",apply:"A posição lacaniana não nega que o analista tem afetos — exige que ele os elabore em análise/supervisão. A escola relacional autoriza mais explicitamente o uso da contratransferência como dado clínico. Em supervisão, é produtivo explorar os afetos do terapeuta.",example:"🏅 <strong>Exemplo:</strong> Terapeuta que sente irritação crescente com um paciente que sempre atrasa. Lacaniano: levar para supervisão, não verbalizar na sessão. Relacional: poderia usar o afeto como dado — 'percebo que fico esperando e me pergunto o que esse esperar significa para você também'."},
+    {cat:"transfer",q:"O que é o desejo do analista em Lacan e por que ele é diferente do desejo de curar?",concept:"O <strong>desejo do analista</strong> não é desejo pessoal de cura, de aprovação ou de poder, mas um desejo que aponta para o real do sujeito: <strong>desejo de diferença pura</strong>, desejo de que o sujeito chegue ao que lhe é mais singular. O analista que deseja 'curar' introduz seu próprio fantasma na direção do tratamento.",apply:"Na clínica, examinar o próprio desejo como clínico: por que escolheu esse trabalho? O que quer de seus pacientes? O desejo de curar, de ser útil, de ser reconhecido são formas do fantasma do analista entrar em cena.",example:"💡 <strong>Exemplo:</strong> Terapeuta que insiste em orientar todo paciente para o mesmo desfecho que considera 'saudável'. Está colocando seu desejo como destino para o paciente. O desejo do analista é que o paciente encontre e habite sua própria singularidade."},
+    {cat:"transfer",q:"O que é a interpretação em psicanálise lacaniana e como ela difere de outras abordagens?",concept:"Na clínica lacaniana, a <strong>interpretação</strong> não é explicação do sentido inconsciente. A interpretação visa o significante, não o significado: ela aponta para a equivocidade da fala, abre sentidos em vez de fechá-los. Formas: <strong>pontuação</strong>, <strong>escansão</strong> (corte no momento significativo), <strong>equívoco</strong> (explorar duplo sentido).",apply:"Na prática, a interpretação lacaniana é mais econômica — menos palavras, mais precisão. Uma única palavra devolvida pode ter mais efeito do que uma interpretação elaborada. A escuta do equívoco requer atenção ao que o paciente diz literalmente.",example:"🏅 <strong>Exemplo:</strong> Paciente diz 'tenho dificuldade em ganhar espaço nas relações'. O analista devolve: 'Ganhar espaço...' — pausa. O paciente começa a falar sobre o quanto precisa de distância para se sentir amado. A interpretação não explicou — abriu."},
+    {cat:"transfer",q:"O que é a direção do tratamento para Lacan e quais são seus três tempos?",concept:"Em 'A direção do tratamento' (1958), Lacan articula três dimensões: <strong>1. A tática</strong> — a interpretação (momento a momento). <strong>2. A estratégia</strong> — o manejo da transferência. <strong>3. A política</strong> — o desejo do analista e a questão do ser do sujeito. O analista não deve confundir os planos.",apply:"Na clínica, a distinção é útil para supervisão: o que está em jogo nesta sessão específica (tática)? Como está a transferência no momento atual (estratégia)? Para onde o tratamento está indo — e de quem é esse destino (política)?",example:"💡 <strong>Exemplo:</strong> Terapeuta que intervém bem momento a momento mas sem clareza sobre para onde o tratamento caminha. Um erro comum é otimizar as sessões sem política clara — progressos pontuais sem direção de tratamento."},
+    {cat:"fim",q:"O que é o fim de análise para Lacan e o que significa 'atravessar o fantasma'?",concept:"O fim de análise implica: <strong>a travessia do fantasma</strong> — o sujeito reconhece e se liberta da cena fantasmática — e a <strong>identificação com o sinthome</strong>. Na travessia, o sujeito descobre que a falta é estrutural e pode habitá-la sem precisar preenchê-la compulsivamente. Isso produz uma mudança de posição subjetiva.",apply:"Na clínica, indicadores de fim de análise: queda da transferência; mudança na relação com o sintoma (menos sofrimento, mais saber-fazer); nova posição frente ao desejo. Não é ausência de problemas — é capacidade ampliada de lidar com o real.",example:"🏅 <strong>Exemplo:</strong> Paciente que durante anos agia apenas para 'provar algo' — e depois de longo trabalho passa a agir por sua própria satisfação. Não desapareceu a falta — mas a relação com ela mudou."},
+    {cat:"fim",q:"O que é a destituição subjetiva e o que vem depois dela?",concept:"A <strong>destituição subjetiva</strong> é um momento do fim de análise: o sujeito, ao atravessar o fantasma, perde as certezas identificatórias que o sustentavam — há uma queda do Outro, do saber suposto. É um momento de desorientação que precede uma nova posição. O que vem depois é a <strong>identificação com o sinthome</strong>: o sujeito sabe-fazer com seu real singular.",apply:"Na clínica, o analista deve poder sustentar a destituição subjetiva do paciente sem apressá-la e sem remendá-la prematuramente. Pacientes nesse momento podem parecer em crise — mas é uma crise de reorganização subjetiva.",example:"💡 <strong>Exemplo:</strong> Paciente que, após anos identificado com um papel ou status, perde esse lugar e não sabe quem é sem ele. Pode ser início de destituição subjetiva produtiva — momento de reconstrução a partir de base menos narcísica."},
+    {cat:"fim",q:"O que Freud entendia como critério de cura e como isso contrasta com a posição lacaniana?",concept:"Freud foi cauteloso com o conceito de cura — reconheceu a '<strong>análise interminável</strong>'. O critério freudiano operacional era capacidade de amar e trabalhar (Lieben und Arbeiten). <strong>Lacan</strong> recusou a normalização como meta — o fim de análise não é tornar o sujeito 'normal', mas levá-lo a uma posição mais singular e menos sofrida frente ao seu real.",apply:"Na clínica, o terapeuta não deve orientar o paciente para um ideal de felicidade. O critério de término não é 'está melhor segundo meus parâmetros', mas 'o sujeito encontrou uma forma mais viva e menos sofrida de habitar sua singularidade'.",example:"🏅 <strong>Exemplo:</strong> Paciente que termina a análise não porque 'resolveu seus problemas' mas porque mudou a relação com eles — age com mais prazer, tolera o fracasso sem colapso identitário, não precisa do olhar do Outro para se validar."},
+    {cat:"fim",q:"O que é o passe em Lacan e qual sua função na transmissão da psicanálise?",concept:"O <strong>passe</strong> é um dispositivo criado por Lacan em 1967 para investigar o que ocorre no fim de análise e transmiti-lo à comunidade analítica. O analisante que chegou ao fim testemunha sua experiência a 'passadores'. O objetivo não é certificação, mas fazer do fim de análise um momento de transmissão viva, não doutrinária.",apply:"O passe aponta para algo fundamental: a análise pessoal não é complemento opcional — é condição de possibilidade do trabalho clínico. O analista que não passou pelo fim de análise reproduz seus próprios fantasmas na direção do tratamento.",example:"💡 <strong>Exemplo:</strong> Psicólogo em formação que nota que certos perfis de paciente o mobilizam demais — ou que determinadas temáticas aparecem em muitos casos seus de forma que parece 'coincidência demais'. Isso é convite para aprofundamento na análise pessoal."},
+    {cat:"fim",q:"Como diferentes escolas psicanalíticas concebem o 'fim' de uma análise? Comparativo entre Lacan, Klein e Winnicott.",concept:"<strong>Lacan:</strong> fim como travessia do fantasma e destituição subjetiva. <strong>Klein:</strong> fim quando as ansiedades persecutórias e depressivas estão suficientemente elaboradas — posição depressiva consolidada, capacidade de reparação. <strong>Winnicott:</strong> fim quando o self verdadeiro tem espaço de expressão e o sujeito consegue usar o espaço transicional (brincar, criar).",apply:"Ter um referencial plural é clinicamente útil. Problemática fantasmática e repetitiva → critérios lacanianos. Dificuldade de integrar ambivalência → critérios kleinianos. Dificuldade de existir genuinamente → critérios winnicottianos. O mesmo paciente pode precisar de todos em momentos diferentes.",example:"🏅 <strong>Exemplo:</strong> Pela via lacaniana — quando não precisa de validação externa, age por desejo singular. Pela via kleiniana — quando integra conquistas e fracassos sem clivagem. Pela via winnicottiana — quando age com genuíno prazer lúdico. Todas são conquistas reais."},
+    {cat:"outras",q:"O que é a posição depressiva em Melanie Klein e como ela articula culpa, reparação e maturidade psíquica?",concept:"Klein propôs dois organizadores: <strong>posição esquizo-paranoide</strong> (clivagem entre objetos bons/maus, ansiedade persecutória, projeção) e <strong>posição depressiva</strong> (integração do objeto como ambivalente, angústia depressiva pela culpa de ter atacado o objeto amado, impulso reparador). A posição depressiva não é patologia — é conquista.",apply:"Na clínica kleiniana, o objetivo é favorecer a consolidação da posição depressiva — o paciente que opera predominantemente na esquizo-paranoide precisa desenvolver tolerância à ambivalência. Interpretar as divisões do objeto (splitting) é central.",example:"💡 <strong>Exemplo:</strong> Paciente que alterna entre idolatrar e destruir mentalmente pessoas significativas — quando decepciona, vira 'o pior de todos'. Isso é splitting kleiniano. O trabalho é ajudá-lo a integrar: a mesma pessoa pode ser boa E ter limitações."},
+    {cat:"outras",q:"O que é o espaço potencial e o objeto transicional em Winnicott e como se aplicam clinicamente?",concept:"Winnicott propôs um <strong>espaço potencial</strong> — zona intermediária de experiência onde acontecem o jogo, a criatividade e a cultura. O <strong>objeto transicional</strong> (o ursinho) é o primeiro objeto 'não-eu' que a criança usa para lidar com a separação da mãe — é simultaneamente criado e encontrado. O espaço transicional é onde a análise acontece.",apply:"Na clínica winnicottiana, criar e sustentar o espaço transicional é o trabalho central — especialmente com pacientes que não conseguem brincar, que são excessivamente literais. O 'brincar' é diagnóstico e terapêutico.",example:"🏅 <strong>Exemplo:</strong> Paciente que não consegue 'brincar' em sentido amplo — toma tudo com seriedade absoluta, sem capacidade de experimentar, arriscar. Isso pode indicar empobrecimento do espaço potencial. O trabalho é criar condições para que o espaço de jogo se restabeleça."},
+    {cat:"outras",q:"O que é o conceito de 'mãe suficientemente boa' e 'holding' em Winnicott?",concept:"Winnicott propôs que o desenvolvimento saudável exige uma <strong>mãe suficientemente boa</strong>: capaz de prover adaptação inicial e, gradualmente, falhar de forma calibrada para promover a separação e o desenvolvimento do self. O <strong>holding</strong> é a função de sustentação física e psíquica que garante ao bebê um ambiente suficientemente seguro para existir.",apply:"Na clínica, o analista oferece um holding equivalente — ambiente de constância, previsibilidade e presença. Com pacientes de estrutura mais frágil (traumas precoces, falhas ambientais severas), o holding precede e condiciona qualquer interpretação. Interpretar antes de segurar é tecnicamente equivocado.",example:"💡 <strong>Exemplo:</strong> Paciente em processo de desenvolvimento precisa de um ambiente terapêutico 'suficientemente bom' — constante, seguro para errar sem punição excessiva. Um terapeuta que oscila entre elogios extremos e críticas destrutivas não oferece holding."},
+    {cat:"outras",q:"O que é identificação projetiva em Klein e Bion e como opera na clínica?",concept:"Klein descreveu a <strong>identificação projetiva</strong> como mecanismo pelo qual o sujeito projeta partes de si no objeto externo e então se identifica com o objeto modificado. Wilfred Bion expandiu: no contexto clínico, o analista recebe as projeções do paciente e as contém — função de <strong>rêverie</strong>: metabolizar o que o paciente não consegue pensar e devolver de forma mais tolerável.",apply:"Na clínica, estar atento ao que o paciente 'faz sentir' no terapeuta é dado clínico valioso. Se o terapeuta sente impotência crônica com determinado paciente, pode estar recebendo a projeção da parte impotente do paciente.",example:"🏅 <strong>Exemplo:</strong> Paciente que faz o psicólogo sentir que 'nada que ele sugira funciona' — o psicólogo começa a se sentir incompetente. Provavelmente é identificação projetiva: o paciente projeta sua experiência de incompetência no terapeuta."},
+    {cat:"outras",q:"O que é a psicologia do self de Kohut e quando ela é clinicamente mais indicada do que a psicanálise lacaniana?",concept:"Heinz Kohut desenvolveu a <strong>Psicologia do Self</strong> para trabalhar com pacientes narcísicos. O self se desenvolve via relações com objetos do self (selfobjects) que provêm espelhamento, idealização e gemeidade. Kohut visa a <strong>coesão e vitalidade do self</strong> — diferente de Lacan, que trabalha com a divisão do sujeito como estrutural.",apply:"Na clínica, reconhecer quando o paciente precisa mais de espelhamento do que de interpretação da falta. Pacientes com self frágil beneficiam-se mais de uma relação terapêutica que ofereça experiências corretivas de espelhamento.",example:"💡 <strong>Exemplo:</strong> Paciente com self muito frágil — qualquer crítica é vivida como ataque existencial, qualquer fracasso é catástrofe identitária. Antes de trabalhar o fantasma lacaniano, pode ser necessário consolidar a coesão do self via espelhamento consistente."},
+    {cat:"outras",q:"O que é a psicanálise relacional e intersubjetiva e como ela difere da abordagem lacaniana?",concept:"A <strong>psicanálise relacional</strong> (Mitchell, Aron, Benjamin) e a <strong>intersubjetiva</strong> (Stolorow, Atwood) propõem que a psique não existe isolada — constitui-se em campo relacional. O terapeuta co-cria o campo terapêutico. Diferente de Lacan, que mantém o analista como posição, não pessoa.",apply:"A perspectiva relacional é especialmente útil com pacientes com trauma relacional precoce — onde o vínculo terapêutico em si é o instrumento de mudança. Combinar escuta lacaniana com sensibilidade relacional produz clínica mais rica.",example:"🏅 <strong>Exemplo:</strong> Paciente com história de abandono parental. O trabalho lacaniano puro pode ser insuficiente se o vínculo terapêutico não oferece experiência relacional diferente. O encontro real com um analista que permanece presente pode ser mais transformador do que qualquer interpretação."},
+    {cat:"outras",q:"O que é o conceito de campo analítico de Ferro e Civitarese (escola italiana pós-bioniana)?",concept:"Ferro e Civitarese desenvolveram o conceito de <strong>campo analítico</strong> a partir de Bion: a sessão analítica é um campo compartilhado onde emergem 'personagens do campo' — figuras que não pertencem nem ao analista nem ao paciente isoladamente, mas ao campo que ambos co-geram. Tudo na sessão é dado do campo.",apply:"Na prática, a perspectiva do campo amplia o que é dado clínico: não apenas o que o paciente diz, mas o que surge na mente do analista, as imagens, os devaneios, a atmosfera emocional da sessão.",example:"💡 <strong>Exemplo:</strong> Em supervisão, ao escutar o relato de uma sessão, o supervisor nota que lhe vem uma imagem de fuga. Isso pode ser dado do campo — algo na dinâmica descrita evoca essa imagem que pode ser clinicamente relevante."},
+  ];
+
+  // ── ESTADO ─────────────────────────────────────────────────────
+  let activeDeck = null;
+  let activeCats = null;
+  let activeCards = null;
+  let activeFilter = 'all';
+  let deck = [], idx = 0, flipped = false;
+  let scores = {hard:0,ok:0,easy:0}, hardCards = [];
+
+  function $(id){ return document.getElementById(id); }
+
+  function buildTabs(cats, allCards){
+    const bar = $('fc-tabs-bar');
+    bar.innerHTML = '';
+    const all = document.createElement('button');
+    all.className = 'fc-tab active'; all.dataset.cat = 'all';
+    all.textContent = 'Todos (' + allCards.length + ')';
+    all.onclick = () => fcSetFilter('all');
+    bar.appendChild(all);
+    Object.entries(cats).forEach(([key, cfg]) => {
+      const count = allCards.filter(c => c.cat === key).length;
+      if(!count) return;
+      const btn = document.createElement('button');
+      btn.className = 'fc-tab'; btn.dataset.cat = key;
+      btn.textContent = cfg.label + ' (' + count + ')';
+      btn.onclick = () => fcSetFilter(key);
+      bar.appendChild(btn);
+    });
+  }
+
+  function fcSetFilter(cat){
+    activeFilter = cat;
+    document.querySelectorAll('.fc-tab').forEach(t => {
+      const isActive = t.dataset.cat === cat;
+      t.classList.toggle('active', isActive);
+      if(isActive && cat !== 'all'){
+        t.style.background = activeCats[cat].color;
+        t.style.borderColor = activeCats[cat].color;
+        t.style.color = '#fff';
+      } else if(isActive){
+        t.style.background = 'var(--purple)';
+        t.style.borderColor = 'var(--purple)';
+        t.style.color = '#fff';
+      } else {
+        t.style.background = '';
+        t.style.borderColor = '';
+        t.style.color = '';
+      }
+    });
+    deck = (cat === 'all' ? [...activeCards] : activeCards.filter(c => c.cat === cat)).sort(() => Math.random() - .5);
+    idx = 0; scores = {hard:0,ok:0,easy:0}; hardCards = [];
+    fcShowMainUI();
+    const desc = cat === 'all'
+      ? 'Deck completo - ' + activeCards.length + ' cards'
+      : activeCats[cat].label + ' - ' + deck.length + ' cards';
+    $('fc-deck-desc').textContent = desc;
+    fcRenderCard();
+  }
+
+  function fcRenderCard(){
+    const c = deck[idx]; flipped = false;
+    $('fc-card').classList.remove('flipped');
+    $('fc-rating-btns').style.display = 'none';
+    $('fc-front-hint').textContent = 'Clique para revelar a resposta';
+    $('fc-question-text').textContent = c.q;
+
+    const body = $('fc-answer-body');
+    if(c.concept !== undefined){
+      body.innerHTML =
+        '<div class="fc-section"><div class="fc-section-label concept">📖 Conceito</div><p class="fc-section-text">' + c.concept + '</p></div>' +
+        '<div class="fc-section"><div class="fc-section-label apply">🏅 Intervenção clínica</div><p class="fc-section-text">' + c.apply + '</p></div>' +
+        '<div class="fc-section"><div class="fc-section-label example">💡 Exemplo</div><p class="fc-section-text">' + c.example + '</p></div>';
+    } else {
+      body.innerHTML = '<p class="fc-answer-text">' + c.a.replace(/\n/g,'<br>') + '</p>';
+    }
+
+    const cfg = activeCats[c.cat];
+    ['fc-front-badge','fc-back-badge'].forEach(id => {
+      const el = $(id);
+      el.textContent = cfg.label; el.style.background = cfg.bg; el.style.color = cfg.color;
+    });
+    fcSyncHeight();
+    fcUpdateProgress();
+  }
+
+  function fcSyncHeight(){
+    setTimeout(() => {
+      const front = document.querySelector('.fc-face.fc-front');
+      const back  = document.querySelector('.fc-face.fc-back');
+      const card  = $('fc-card');
+      if(front && back && card) card.style.minHeight = Math.max(front.scrollHeight, back.scrollHeight) + 'px';
+    }, 30);
+  }
+
+  function fcUpdateProgress(){
+    const total = deck.length, pct = Math.round((idx/total)*100);
+    $('fc-card-counter').textContent = 'Card ' + (idx+1) + ' / ' + total;
+    $('fc-pct').textContent = pct + '%';
+    $('fc-bar-fill').style.width = pct + '%';
+    $('fc-s-hard').textContent = scores.hard;
+    $('fc-s-ok').textContent   = scores.ok;
+    $('fc-s-easy').textContent = scores.easy;
+    $('fc-s-left').textContent = total - idx;
+  }
+
+  function fcShowMainUI(){
+    $('fc-done-screen').style.display  = 'none';
+    $('fc-scene').style.display        = 'block';
+    $('fc-rating-btns').style.display  = 'none';
+    $('fc-stats-bar').style.display    = 'flex';
+    $('fc-progress-wrap').style.display = 'block';
+  }
+
+  function openDeck(deckName){
+    activeDeck  = deckName;
+    activeCats  = deckName === 'sport' ? SPORT_CATS  : PSIC_CATS;
+    activeCards = deckName === 'sport' ? SPORT_CARDS : PSIC_CARDS;
+    const title = deckName === 'sport' ? '🧠 Sport Psych' : '🛋️ Psicanálise Clínica';
+    $('fc-deck-title').textContent = title;
+    $('fc-deck-selector').style.display = 'none';
+    $('fc-study-area').style.display    = 'flex';
+    $('fc-study-area').style.flexDirection = 'column';
+    buildTabs(activeCats, activeCards);
+    fcSetFilter('all');
+  }
+
+  function closeDeck(){
+    $('fc-deck-selector').style.display = 'flex';
+    $('fc-deck-selector').style.flexDirection = 'column';
+    $('fc-study-area').style.display = 'none';
+  }
+
+  function toggleFlip(){
+    flipped = !flipped;
+    $('fc-card').classList.toggle('flipped', flipped);
+    if(flipped){
+      $('fc-rating-btns').style.display = 'flex';
+      $('fc-front-hint').textContent = 'Clique para reler a pergunta';
+    } else {
+      $('fc-front-hint').textContent = 'Clique para revelar a resposta';
+    }
+  }
+
+  function rate(level){
+    if(level === 'hard') hardCards.push(deck[idx]);
+    scores[level]++;
+    if(idx < deck.length - 1){ idx++; fcRenderCard(); } else { showDone(); }
+  }
+
+  function showDone(){
+    $('fc-scene').style.display         = 'none';
+    $('fc-rating-btns').style.display   = 'none';
+    $('fc-stats-bar').style.display     = 'none';
+    $('fc-progress-wrap').style.display = 'none';
+    $('fc-done-screen').style.display   = 'flex';
+    $('fc-d-hard').textContent = scores.hard;
+    $('fc-d-ok').textContent   = scores.ok;
+    $('fc-d-easy').textContent = scores.easy;
+  }
+
+  function restartWithHard(){
+    if(hardCards.length === 0){ fcSetFilter(activeFilter); return; }
+    deck = [...hardCards].sort(() => Math.random() - .5);
+    idx = 0; scores = {hard:0,ok:0,easy:0}; hardCards = [];
+    fcShowMainUI();
+    $('fc-deck-desc').textContent = 'Revisão — Difíceis · ' + deck.length + ' cards';
+    fcRenderCard();
+  }
+
+  return {
+    openDeck,
+    closeDeck,
+    toggleFlip,
+    rate,
+    resetDeck(){ fcSetFilter(activeFilter); },
+    prevCard(){ if(idx > 0){ idx--; fcRenderCard(); } },
+    shuffle(){ deck = deck.sort(() => Math.random() - .5); idx = 0; scores = {hard:0,ok:0,easy:0}; hardCards = []; fcRenderCard(); },
+    restartWithHard,
+  };
+})();
+
+function openFlashcardDeck(name)   { FlashcardsModule.openDeck(name); }
+function closeFlashcardDeck()      { FlashcardsModule.closeDeck(); }
+function fcToggleFlip()            { FlashcardsModule.toggleFlip(); }
+function fcRate(l)                 { FlashcardsModule.rate(l); }
+function fcResetDeck()             { FlashcardsModule.resetDeck(); }
+function fcPrevCard()              { FlashcardsModule.prevCard(); }
+function fcShuffle()               { FlashcardsModule.shuffle(); }
+function fcRestartWithHard()       { FlashcardsModule.restartWithHard(); }
+
 </script>
 </body>
 </html>
