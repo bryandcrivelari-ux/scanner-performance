@@ -3047,7 +3047,7 @@ function renderAll() {
     const domains=[{l:'Físico',k:'fisico'},{l:'Psicológico',k:'psicologico'},{l:'Social',k:'social'},{l:'Ambiental',k:'ambiental'}];
     const grid=document.getElementById('qvGrid'), el=document.getElementById('qvMed');
     if(!D.qv || !D.qv.aplicado){
-      grid.innerHTML = domains.map(d=>`<div class="qv-domain" style="background:var(--bg-inset);border-color:var(--border);"><div class="qv-domain-lbl">${d.l}</div><div class="qv-domain-score" style="color:var(--text-faint);font-size:16px;">— não aplicado —</div></div>`).join('');
+      grid.innerHTML = domains.map(d=>`<div class="qv-domain" style="background:var(--bg-inset);border-color:var(--border);"><div class="qv-domain-lbl">${d.l}</div><div class="qv-domain-score" style="color:var(--text-faint) !important;font-size:13px !important;font-weight:600 !important;letter-spacing:normal !important;line-height:1.4;">— não aplicado —</div></div>`).join('');
       el.textContent='—'; el.style.color='var(--text-faint)';
       return;
     }
