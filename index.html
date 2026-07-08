@@ -1662,10 +1662,10 @@ textarea.sp-input { resize: vertical; min-height: 80px; line-height: 1.6; }
 
       <div class="sp-section">
         <div class="sp-section-title">WHOQOL · Qualidade de Vida (0–100)</div>
-        <div class="sp-field"><label class="sp-label">Físico</label><div class="sp-slider-row"><input class="sp-slider" id="f-qvf" type="range" min="0" max="100" oninput="document.getElementById('v-qvf').textContent=this.value;update()"><span class="sp-val" id="v-qvf">—</span></div></div>
-        <div class="sp-field"><label class="sp-label">Psicológico</label><div class="sp-slider-row"><input class="sp-slider" id="f-qvp" type="range" min="0" max="100" oninput="document.getElementById('v-qvp').textContent=this.value;update()"><span class="sp-val" id="v-qvp">—</span></div></div>
-        <div class="sp-field"><label class="sp-label">Social</label><div class="sp-slider-row"><input class="sp-slider" id="f-qvs" type="range" min="0" max="100" oninput="document.getElementById('v-qvs').textContent=this.value;update()"><span class="sp-val" id="v-qvs">—</span></div></div>
-        <div class="sp-field"><label class="sp-label">Ambiental</label><div class="sp-slider-row"><input class="sp-slider" id="f-qva" type="range" min="0" max="100" oninput="document.getElementById('v-qva').textContent=this.value;update()"><span class="sp-val" id="v-qva">—</span></div></div>
+        <div class="sp-field"><label class="sp-label">Físico</label><div class="sp-slider-row"><input class="sp-slider" id="f-qvf" type="range" min="0" max="100" oninput="document.getElementById('v-qvf').textContent=this.value;DADOS.qv.aplicado=true;update()"><span class="sp-val" id="v-qvf">—</span></div></div>
+        <div class="sp-field"><label class="sp-label">Psicológico</label><div class="sp-slider-row"><input class="sp-slider" id="f-qvp" type="range" min="0" max="100" oninput="document.getElementById('v-qvp').textContent=this.value;DADOS.qv.aplicado=true;update()"><span class="sp-val" id="v-qvp">—</span></div></div>
+        <div class="sp-field"><label class="sp-label">Social</label><div class="sp-slider-row"><input class="sp-slider" id="f-qvs" type="range" min="0" max="100" oninput="document.getElementById('v-qvs').textContent=this.value;DADOS.qv.aplicado=true;update()"><span class="sp-val" id="v-qvs">—</span></div></div>
+        <div class="sp-field"><label class="sp-label">Ambiental</label><div class="sp-slider-row"><input class="sp-slider" id="f-qva" type="range" min="0" max="100" oninput="document.getElementById('v-qva').textContent=this.value;DADOS.qv.aplicado=true;update()"><span class="sp-val" id="v-qva">—</span></div></div>
         <div style="font-size:11px;color:#444;margin-top:6px;">Média calculada automaticamente</div>
       </div>
 
@@ -2316,7 +2316,7 @@ function calcRiscoGeral(dados) {
   if (dados.cfq?.score >= 50) alertas++;
   if (dados.ess?.score >= 13) alertas++;
   if (dados.psqi?.score >= 11) alertas++;
-  const qvMedia = dados.qv
+  const qvMedia = (dados.qv && dados.qv.aplicado)
     ? (dados.qv.fisico + dados.qv.psicologico + dados.qv.social + dados.qv.ambiental) / 4
     : 100;
   if (qvMedia < 50) alertas++;
@@ -2345,7 +2345,7 @@ function defaultDados() {
   return {
     atleta: '', data: '', psicologo: '', sessao: '', idade: '', time: '',
     big5: { extroversao:50, amabilidade:50, conscienciosidade:50, neuroticismo:50, abertura:50 },
-    qv:   { fisico:50, psicologico:50, social:50, ambiental:50 },
+    qv:   { fisico:50, psicologico:50, social:50, ambiental:50, aplicado:false },
     estresse: { score:0 }, cfq: { score:0 }, ess: { score:0 }, psqi: { score:0 },
     resumo: { interpretacao:'', atencao:'', proximos:'', observacoes:'' },
     consentimento: { registrado: false, data: '' },
@@ -2640,6 +2640,11 @@ async function openSession(id) {
 
   currentSessionId = id;
   DADOS = data.data;
+  // Compatibilidade retroativa: sessões salvas antes da flag 'aplicado' existir
+  // já continham um resultado real (o psicólogo aplicou o teste), então tratamos
+  // como aplicado. Só sessões novas (criadas após esta versão) nascem com aplicado:false.
+  if (!DADOS.qv) DADOS.qv = { fisico:50, psicologico:50, social:50, ambiental:50, aplicado:true };
+  else if (DADOS.qv.aplicado === undefined) DADOS.qv.aplicado = true;
   syncFormToData();
   renderAll();
   setSaveStatus('');
@@ -3040,8 +3045,14 @@ function renderAll() {
   // QV
   (function(){
     const domains=[{l:'Físico',k:'fisico'},{l:'Psicológico',k:'psicologico'},{l:'Social',k:'social'},{l:'Ambiental',k:'ambiental'}];
-    document.getElementById('qvGrid').innerHTML=domains.map(d=>{ const v=D.qv[d.k],c=qvColors(v); return `<div class="qv-domain" style="background:${c.bg};border-color:${c.border};"><div class="qv-domain-lbl">${d.l}</div><div class="qv-domain-score" style="color:${c.text};">${v}<span class="qv-domain-max"> /100</span></div><div class="bar-track" style="margin-top:6px;background:rgba(255,255,255,.06);"><div class="bar-fill" style="width:${v}%;background:${c.bar};"></div></div></div>`; }).join('');
-    const mv=(D.qv.fisico+D.qv.psicologico+D.qv.social+D.qv.ambiental)/4,mc=qvColors(mv),el=document.getElementById('qvMed');
+    const grid=document.getElementById('qvGrid'), el=document.getElementById('qvMed');
+    if(!D.qv || !D.qv.aplicado){
+      grid.innerHTML = domains.map(d=>`<div class="qv-domain" style="background:var(--bg-inset);border-color:var(--border);"><div class="qv-domain-lbl">${d.l}</div><div class="qv-domain-score" style="color:var(--text-faint);font-size:16px;">— não aplicado —</div></div>`).join('');
+      el.textContent='—'; el.style.color='var(--text-faint)';
+      return;
+    }
+    grid.innerHTML=domains.map(d=>{ const v=D.qv[d.k],c=qvColors(v); return `<div class="qv-domain" style="background:${c.bg};border-color:${c.border};"><div class="qv-domain-lbl">${d.l}</div><div class="qv-domain-score" style="color:${c.text};">${v}<span class="qv-domain-max"> /100</span></div><div class="bar-track" style="margin-top:6px;background:rgba(255,255,255,.06);"><div class="bar-fill" style="width:${v}%;background:${c.bar};"></div></div></div>`; }).join('');
+    const mv=(D.qv.fisico+D.qv.psicologico+D.qv.social+D.qv.ambiental)/4,mc=qvColors(mv);
     el.textContent=mv.toFixed(1)+' / 100'; el.style.color=mc.text;
   })();
 
@@ -5144,7 +5155,7 @@ const WHOQOLModule = (() => {
     {n:3,  d:'F', rev:true,  text:'Em que medida você acha que sua dor (física) te impede de fazer o que você precisa?', opts:['Nada','Muito pouco','Mais ou menos','Bastante','Extremamente']},
     {n:4,  d:'F', rev:true,  text:'O quanto você precisa de algum tratamento médico para levar sua vida diária?', opts:['Nada','Muito pouco','Mais ou menos','Bastante','Extremamente']},
     {n:5,  d:'P', rev:false, text:'O quanto você aproveita a vida?', opts:['Nada','Muito pouco','Mais ou menos','Bastante','Extremamente']},
-    {n:6,  d:'P', rev:true,  text:'Em que medida você acha que a sua vida tem sentido?', opts:['Nada','Muito pouco','Mais ou menos','Bastante','Extremamente']},
+    {n:6,  d:'P', rev:false, text:'Em que medida você acha que a sua vida tem sentido?', opts:['Nada','Muito pouco','Mais ou menos','Bastante','Extremamente']},
     {n:7,  d:'P', rev:false, text:'O quanto você consegue se concentrar?', opts:['Nada','Muito pouco','Mais ou menos','Bastante','Extremamente']},
     {n:8,  d:'A', rev:false, text:'Quão seguro(a) você se sente em sua vida diária?', opts:['Nada','Muito pouco','Mais ou menos','Bastante','Extremamente']},
     {n:9,  d:'A', rev:false, text:'Quão saudável é o seu ambiente físico (clima, barulho, poluição)?', opts:['Nada','Muito pouco','Mais ou menos','Bastante','Extremamente']},
@@ -5320,7 +5331,7 @@ const WHOQOLModule = (() => {
 
   function _save(){
     const sc=ST.scores;if(!sc||!sc.F)return;
-    DADOS.qv={fisico:sc.F,psicologico:sc.P,social:sc.R,ambiental:sc.A};
+    DADOS.qv={fisico:sc.F,psicologico:sc.P,social:sc.R,ambiental:sc.A,aplicado:true};
     [['f-qvf','v-qvf',sc.F],['f-qvp','v-qvp',sc.P],['f-qvs','v-qvs',sc.R],['f-qva','v-qva',sc.A]].forEach(([fid,vid,val])=>{const el=document.getElementById(fid);if(el)el.value=val;const vel=document.getElementById(vid);if(vel)vel.textContent=val;});
     update();
     const btn=document.getElementById('btn-open-whoqol');if(btn){btn.textContent='✓ Concluído';btn.className='btn-apply-test done';}
